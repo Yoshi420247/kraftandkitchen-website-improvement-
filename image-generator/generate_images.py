@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """
-Kraft & Kitchen Product Image Generator
+Kraft & Kitchen Product Image Generator v2
 Uses DALL-E 3 to generate craft product photography
+
+Based on comprehensive build specification with prompts optimized for:
+- Heat Press Nation style (size-first, heavy proof)
+- Diamond Art Club style (extreme proof, clean merchandising)
+- Etsy sticker book aesthetic (double-sided, letter size, small packs)
 
 IMPORTANT: Create a .env file with your API key:
 OPENAI_API_KEY=your_key_here
@@ -17,125 +22,474 @@ from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
 # Initialize OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Output directory for generated images
+# Output directory
 OUTPUT_DIR = Path("generated_images")
 OUTPUT_DIR.mkdir(exist_ok=True)
 
-# Image generation prompts based on photography shot list
-PRODUCT_PROMPTS = {
-    # PTFE Cover Sheets
-    "ptfe-hero-on-press": {
-        "prompt": """Professional product photography of a beige/tan PTFE Teflon cover sheet laying flat on a heat press platen. The heat press is a modern clamshell style, partially open at a 45-degree angle to show the sheet clearly. The PTFE sheet is smooth, slightly translucent, and extends slightly beyond the platen edges. Clean, bright studio lighting with soft shadows. White/light gray background. Commercial e-commerce product photography style. 16:20 aspect ratio sheet visible. High-end craft supply aesthetic.""",
-        "filename": "ptfe-cover-sheet-hero-on-press"
+# =============================================================================
+# PHOTOGRAPHY PROMPTS - Organized by Category
+# =============================================================================
+
+PROMPTS = {
+    # =========================================================================
+    # HOMEPAGE HERO
+    # =========================================================================
+    "homepage-hero": {
+        "prompt": """Bright, clean craft studio. Overhead 3/4 angle of a tidy workspace with:
+- a stack of silicone release paper sheets
+- a sticker sheet partially peeled and placed onto release paper
+- a cutting machine in the background (generic, no logos)
+- a few tools (weeding tool, scraper, tweezers)
+
+Warm off-white or subtle kraft surface. Soft natural window light. Minimal props.
+Leave clear negative space on the left for headline text.
+High-end e-commerce photography. Professional studio lighting.
+Aspect ratio: 16:9 horizontal.""",
+        "filename": "kk_homepage_hero",
+        "size": "1792x1024"
     },
 
-    "ptfe-covering-design": {
-        "prompt": """Professional product photography showing hands placing a beige PTFE cover sheet over a colorful heat transfer vinyl design on a dark t-shirt. The design beneath shows through slightly. Heat press visible in background, ready to close. Demonstrates the protective barrier use case. Clean, well-lit craft workspace. Natural hand positioning, realistic use scenario. E-commerce lifestyle photography style.""",
-        "filename": "ptfe-cover-sheet-in-use"
+    # =========================================================================
+    # SHOP BY PROJECT TILES (6 tiles, 1:1)
+    # =========================================================================
+    "tile-stickers": {
+        "prompt": """Top-down flat lay on warm off-white or kraft-toned surface.
+Center: silicone release paper sheet with 6-8 colorful kiss-cut stickers arranged neatly.
+One sticker partially peeled, showing clean release action.
+Props: small weeding tool, binder clip.
+Bright, high clarity. Professional e-commerce photography.
+No text, no logos, no brand names.
+Square crop 1:1.""",
+        "filename": "kk_tile_stickers_sticker_books",
+        "size": "1024x1024"
     },
 
-    "ptfe-texture-closeup": {
-        "prompt": """Macro close-up photography of PTFE-coated fiberglass sheet texture. Shows the fine woven fiberglass pattern beneath the smooth PTFE coating. Beige/tan color with slight sheen. Neutral gray background. Sharp focus on material texture. Professional product detail shot for e-commerce. Clean, minimalist composition.""",
-        "filename": "ptfe-texture-closeup"
+    "tile-transfers": {
+        "prompt": """Top-down flat lay on warm off-white surface.
+Center: release paper sheet with a UV DTF transfer design (colorful abstract graphic, no copyrighted imagery).
+Props: squeegee, transfer tape roll, pair of scissors.
+Bright studio lighting. Professional product photography.
+No text, no logos.
+Square crop 1:1.""",
+        "filename": "kk_tile_transfers_uv_dtf",
+        "size": "1024x1024"
+    },
+
+    "tile-heat-press": {
+        "prompt": """Top-down flat lay on warm off-white surface.
+Center: folded beige PTFE cover sheet with a kraft paper belly band.
+Props: colorful sublimation print (abstract geometric pattern), heat-resistant glove, small timer.
+Bright, high clarity. Professional studio lighting.
+No text, no logos.
+Square crop 1:1.""",
+        "filename": "kk_tile_heat_press_sublimation",
+        "size": "1024x1024"
+    },
+
+    "tile-diamond-painting": {
+        "prompt": """Top-down flat lay on warm off-white surface.
+Center: stack of 4x4 white release paper squares fanned out elegantly.
+Props: diamond painting tray with colorful sparkly drills (red, blue, green, gold), applicator pen, small section of diamond painting canvas visible.
+Bright lighting, jewel-toned accents from the drills catching light.
+No text, no logos.
+Square crop 1:1.""",
+        "filename": "kk_tile_diamond_painting",
+        "size": "1024x1024"
+    },
+
+    "tile-resin": {
+        "prompt": """Top-down flat lay on warm off-white surface.
+Center: silicone mat (teal or gray color) with small cured resin pieces in various shapes, one piece mid-peel showing easy release.
+Props: small mixing cups, wooden stir sticks, generic resin bottle.
+Bright, clean lighting. Professional product photography.
+No text, no logos.
+Square crop 1:1.""",
+        "filename": "kk_tile_resin_glue",
+        "size": "1024x1024"
+    },
+
+    "tile-work-surfaces": {
+        "prompt": """Top-down flat lay on warm off-white surface.
+Center: gray silicone mat laid flat with corner slightly folded up to show flexibility and thickness.
+Props: craft knife, metal ruler, cutting mat edge visible.
+Clean, minimal, professional.
+No text, no logos.
+Square crop 1:1.""",
+        "filename": "kk_tile_work_surfaces",
+        "size": "1024x1024"
+    },
+
+    # =========================================================================
+    # PTFE COVER SHEETS - Full Shot List
+    # =========================================================================
+    "ptfe-pack-shot": {
+        "prompt": """Studio product photo on pure white seamless background.
+PTFE cover sheet (beige/tan color) folded neatly with a kraft paper belly band label.
+Label shows minimal black typography: "PTFE Cover Sheet" and size marking.
+Soft shadow beneath product, high clarity, no harsh reflections.
+Professional e-commerce product photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_ptfe_pack_shot_white",
+        "size": "1024x1024"
+    },
+
+    "ptfe-texture-macro": {
+        "prompt": """Macro close-up photography of PTFE-coated fiberglass sheet surface.
+Shows the fine woven fiberglass texture beneath the PTFE coating.
+Beige/tan color with subtle sheen.
+Neutral off-white background.
+Side lighting at 45 degrees to reveal surface texture and material quality.
+Sharp focus on weave pattern, shallow depth of field.
+Professional macro product photography.
+Aspect ratio: 1:1 square.""",
+        "filename": "kk_ptfe_texture_macro",
+        "size": "1024x1024"
+    },
+
+    "ptfe-in-use-heat-press": {
+        "prompt": """Heat press workstation scene - clean, organized, realistic small business setting.
+Hands placing beige PTFE cover sheet over a black t-shirt with colorful HTV vinyl design.
+The vinyl design is visible beneath the translucent PTFE sheet.
+Heat press is modern clamshell style, open at 60 degrees, ready to close.
+No visible brand logos on equipment.
+Natural lighting mixed with workspace lighting.
+Focus on the PTFE sheet edge and precise alignment.
+Professional lifestyle product photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_ptfe_in_use_heat_press",
+        "size": "1024x1024"
+    },
+
+    "ptfe-finish-comparison": {
+        "prompt": """Before/after comparison diptych showing PTFE cover sheet effect.
+Two identical white t-shirts with same colorful HTV design, side by side.
+
+LEFT: Pressed without cover sheet - design shows slight texture, matte finish.
+Small subtle label in corner: "Without"
+
+RIGHT: Pressed with PTFE cover sheet - design shows smoother, subtle semi-gloss finish.
+Small subtle label in corner: "With PTFE"
+
+Same camera angle, same exposure, same studio lighting for both.
+Clean, honest comparison. Professional product photography.
+Aspect ratio: 16:9 horizontal.""",
+        "filename": "kk_ptfe_finish_comparison",
+        "size": "1792x1024"
     },
 
     "ptfe-cleaning-demo": {
-        "prompt": """Product photography showing a hand wiping a PTFE cover sheet with a white microfiber cloth. The sheet is beige/tan, laying on a clean white surface. Some light residue visible being wiped away. Demonstrates easy cleaning and maintenance. Bright, clean lighting. E-commerce instructional photography style.""",
-        "filename": "ptfe-cleaning-demo"
+        "prompt": """Close-up product photography showing PTFE sheet care and maintenance.
+Hands holding white microfiber cloth, wiping a small area of ink residue off PTFE cover sheet.
+Sheet is beige/tan color, laying on clean white surface.
+Shows the easy-clean action - residue lifting off cleanly.
+Bright, clean workspace lighting.
+Professional instructional product photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_ptfe_cleaning_demo",
+        "size": "1024x1024"
     },
 
     "ptfe-storage-flat": {
-        "prompt": """Product photography showing PTFE cover sheets stored flat on a shelf or hanging on a hook. Multiple sheets stacked neatly. Clean, organized craft storage aesthetic. Demonstrates proper flat storage - not folded or rolled. Small text overlay area for 'Store Flat' messaging. Bright, clean e-commerce style.""",
-        "filename": "ptfe-storage-flat"
+        "prompt": """Product photography showing proper PTFE sheet storage for longevity.
+Multiple PTFE cover sheets (beige/tan) stacked flat inside a kraft paper portfolio folder.
+OR laying flat between two rigid cardboard sheets.
+Shows the "store flat, never fold" best practice.
+Minimal scene, tidy craft storage aesthetic.
+Professional instructional photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_ptfe_storage_flat",
+        "size": "1024x1024"
     },
 
-    # Silicone Release Paper - Sticker Use
-    "release-paper-sticker-peel": {
-        "prompt": """Professional product photography of a colorful decorative sticker being peeled from white silicone release paper. The sticker is lifting cleanly, showing no residue on the paper. Fingers holding the sticker edge naturally. The release paper has a smooth, slightly shiny surface. Bright, cheerful lighting. Clean white background. E-commerce hero shot for sticker storage product. Satisfying peel action visible.""",
-        "filename": "release-paper-sticker-peel-hero"
+    # =========================================================================
+    # RELEASE PAPER SHEETS - Full Shot List
+    # =========================================================================
+    "release-pack-shot": {
+        "prompt": """Studio product photo on pure white seamless background.
+Stack of 50 white silicone release paper sheets in kraft paper envelope or with kraft belly band.
+Label visible showing: "Silicone Release Paper" / "8.5 x 11" / "50 Sheets"
+Soft shadow beneath, high clarity.
+Professional e-commerce product photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_release_paper_pack_shot",
+        "size": "1024x1024"
     },
 
-    "release-paper-sticker-book": {
-        "prompt": """Product photography of a sticker organization system using silicone release paper in a 3-ring binder. Multiple colorful stickers organized on white release paper pages. The binder is open showing several pages. Demonstrates letter-size (8.5x11) paper with 3-hole punch. Craft room aesthetic. Organized, colorful, appealing to sticker collectors. E-commerce lifestyle photography.""",
-        "filename": "release-paper-sticker-book"
+    "release-texture-macro": {
+        "prompt": """Macro photography of silicone-coated paper surface.
+Shallow angle lighting to catch the subtle sheen of silicone coating.
+Shows the smooth, almost liquid-like surface quality.
+Neutral gray background.
+Professional macro product photography.
+Aspect ratio: 1:1 square.""",
+        "filename": "kk_release_paper_texture_macro",
+        "size": "1024x1024"
     },
 
-    "release-paper-multiple-stickers": {
-        "prompt": """Flat lay photography of silicone release paper with various colorful stickers arranged neatly. Mix of sticker sizes and styles - decorative, planner stickers, die cuts. White release paper with slight sheen visible. Clean white background. Demonstrates storage capacity and organization potential. Bright, Pinterest-worthy craft aesthetic.""",
-        "filename": "release-paper-sticker-storage-flatlay"
+    "release-sticker-peel-hero": {
+        "prompt": """Top-down desk scene - the hero conversion shot for sticker storage.
+Warm off-white or kraft surface.
+Release paper sheet laying flat with 8-10 colorful kiss-cut stickers (various shapes: hearts, stars, flowers, phrases) placed on it.
+One hand holding tweezers, lifting a sticker off the release paper.
+The peel action shows clean release - no residue, sticker adhesive intact, satisfying separation.
+Props: weeding tool, scraper nearby.
+Soft natural daylight from window.
+Professional lifestyle product photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_release_paper_sticker_peel_hero",
+        "size": "1024x1024"
     },
 
-    # Diamond Painting Release Paper
-    "diamond-painting-squares-hero": {
-        "prompt": """Professional product photography of a diamond painting canvas in progress with white 4x4 inch release paper squares covering unexposed sections. Some diamonds already placed in completed area. The release paper squares protect the adhesive canvas. Clean craft workspace. Shows section-by-section working method. Colorful diamond painting design visible in completed areas. E-commerce hero shot.""",
-        "filename": "diamond-painting-squares-hero"
+    "release-sticker-book-storage": {
+        "prompt": """Sticker book organization system in action.
+Open white 3-ring binder on clean light wood desk surface.
+Inside: release paper sheets on rings or in page protectors.
+Multiple pages visible with colorful stickers organized across them - decorative stickers, planner stickers, washi samples.
+Shows the sticker book storage system that Etsy buyers love.
+Clean, minimal aesthetic. No logos on binder.
+Professional lifestyle photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_release_paper_sticker_book",
+        "size": "1024x1024"
     },
 
-    "diamond-painting-squares-closeup": {
-        "prompt": """Close-up product photography showing 4x4 inch white release paper squares positioned on a diamond painting canvas. One square being lifted to reveal the adhesive beneath. Shows the protective function clearly. Some colorful diamonds visible in adjacent completed section. Clean, focused composition. E-commerce detail shot.""",
-        "filename": "diamond-painting-squares-detail"
+    "release-printer-proof": {
+        "prompt": """Laser printer compatibility proof shot.
+Generic white laser printer, output tray view.
+Release paper sheet emerging from printer.
+Printed sticker sheet layout visible (simple geometric shapes, circles, squares - no copyrighted imagery).
+Shows "laser printer compatible" claim.
+Clean office/craft room lighting.
+Professional product photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_release_paper_printer_proof",
+        "size": "1024x1024"
     },
 
-    "diamond-painting-squares-pack": {
-        "prompt": """Product photography of a stack of white 4x4 inch silicone release paper squares. Neat stack showing approximately 200 squares. Clean white background. A ruler or hand for scale reference. Some squares fanned out to show quantity. Professional e-commerce pack shot. Clean, commercial aesthetic.""",
-        "filename": "diamond-painting-squares-pack"
+    "release-how-to-graphic": {
+        "prompt": """Three-panel instructional graphic showing release paper usage, horizontal layout.
+
+PANEL 1 labeled "1. Place": Hand placing a colorful sticker onto white release paper surface.
+
+PANEL 2 labeled "2. Peel": Hand peeling sticker off - shows clean release action, no residue.
+
+PANEL 3 labeled "3. Store": Sticker storage page inside an open binder.
+
+Minimal style, real photo cutouts on warm off-white background.
+Consistent bright lighting across all panels.
+Professional instructional graphic.
+Aspect ratio: 16:9 horizontal.""",
+        "filename": "kk_release_paper_how_to_3step",
+        "size": "1792x1024"
     },
 
-    # Lifestyle and Collection Images
-    "craft-supplies-flatlay": {
-        "prompt": """Overhead flat lay photography of craft supplies including PTFE cover sheets, silicone release paper, colorful stickers, heat press supplies, and diamond painting materials. Organized, aesthetically pleasing arrangement. Pastel and bright colors. Clean white marble or light wood surface. Pinterest-worthy craft blogger aesthetic. Professional product photography for collection page header.""",
-        "filename": "craft-supplies-lifestyle-flatlay"
+    # =========================================================================
+    # DIAMOND PAINTING SQUARES - Full Shot List
+    # =========================================================================
+    "diamond-canvas-sectioning-hero": {
+        "prompt": """Diamond painting canvas in progress - the hero shot for diamond painting release paper.
+Top-down view of 12x16 inch canvas showing a colorful landscape design (mountains, sunset, trees).
+Multiple 4x4 white release paper squares placed in grid pattern covering unexposed sections.
+Squares slightly overlap at edges (2-3mm overlap visible).
+One section exposed showing adhesive canvas with diamonds partially placed.
+Diamond drill tray with colorful sparkly drills (organized by color) at bottom of frame.
+Applicator pen visible.
+Bright, clean white desk surface.
+Soft daylight lighting.
+Professional lifestyle product photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_diamond_painting_squares_hero",
+        "size": "1024x1024"
     },
 
-    "heat-press-workspace": {
-        "prompt": """Lifestyle photography of a clean, organized heat press workspace. Modern clamshell heat press, stack of blank t-shirts, PTFE cover sheets nearby, HTV vinyl rolls visible. Bright, well-lit craft room. Professional but approachable. Small business or serious hobbyist aesthetic. E-commerce collection page header image.""",
-        "filename": "heat-press-workspace-lifestyle"
+    "diamond-peel-place-closeup": {
+        "prompt": """Close-up shot showing diamond painting workflow.
+Hands lifting original plastic cover film from one section of colorful diamond painting canvas.
+A 4x4 white release paper square is about to be placed onto the exposed adhesive.
+Focus on the edges of the release paper square - clean, precise.
+Shows the replacement action - protective cover to release paper.
+Shallow depth of field, professional product photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_diamond_painting_peel_place",
+        "size": "1024x1024"
     },
 
-    "sticker-maker-workspace": {
-        "prompt": """Lifestyle photography of a sticker maker's workspace. Sticker sheets, cutting machine visible, silicone release paper stacks, organized sticker storage binder. Colorful, creative atmosphere. Clean desk with natural light. Small business crafter aesthetic. E-commerce lifestyle photography for sticker supplies collection.""",
-        "filename": "sticker-maker-workspace-lifestyle"
-    }
+    "diamond-progress-triptych": {
+        "prompt": """Three-panel horizontal image showing diamond painting workflow:
+
+PANEL 1 "Cover": Full canvas view with all sections covered by white 4x4 release paper squares in neat grid. Clean, protected.
+
+PANEL 2 "Work": One section uncovered and exposed. Hand with applicator pen placing colorful diamonds. Drill tray visible.
+
+PANEL 3 "Protect": Same section now re-covered with release paper square. Work paused safely.
+
+Consistent lighting and camera angle across all three panels.
+Professional instructional product photography.
+Aspect ratio: 16:9 horizontal.""",
+        "filename": "kk_diamond_painting_progress_triptych",
+        "size": "1792x1024"
+    },
+
+    "diamond-pack-quantity": {
+        "prompt": """Product quantity shot on pure white background.
+Stack of 200 white 4x4 release paper squares.
+Stack is neat, edges precisely aligned.
+A few squares (5-6) fanned out elegantly to show quantity.
+Small metal ruler positioned at edge showing 4 inch measurement.
+Simple, clean commercial product photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_diamond_painting_squares_pack",
+        "size": "1024x1024"
+    },
+
+    "diamond-size-reference": {
+        "prompt": """Size reference shot for 4x4 release paper square.
+Single white 4x4 release paper square held in hand (natural pose).
+OR laying on surface with small metal ruler clearly showing exact 4 inch measurement on both sides.
+Clean white background.
+Shows actual size clearly for customer confidence.
+Professional product photography.
+Aspect ratio: 1:1 square.""",
+        "filename": "kk_diamond_painting_size_reference",
+        "size": "1024x1024"
+    },
+
+    # =========================================================================
+    # SILICONE MATS - Full Shot List
+    # =========================================================================
+    "mat-flat-product": {
+        "prompt": """Silicone mat product shot.
+Gray or teal silicone mat (18x24 inches) laying flat on clean white table.
+Corner of mat slightly lifted to show flexibility and thickness.
+Small metal ruler positioned at edge for scale reference.
+Clean, minimal props.
+Soft shadow beneath.
+Professional e-commerce product photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_silicone_mat_product",
+        "size": "1024x1024"
+    },
+
+    "mat-resin-proof": {
+        "prompt": """Silicone mat cleanup proof shot - shows non-stick property.
+Close-up action shot of cured resin piece being peeled off silicone mat surface.
+Hand pulling up the cured clear resin piece - it releases cleanly with no residue.
+Shows the non-stick property that crafters need.
+Clean workshop lighting.
+Professional product photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_silicone_mat_resin_proof",
+        "size": "1024x1024"
+    },
+
+    "mat-workspace-setup": {
+        "prompt": """Silicone mat in real workspace use.
+Gray silicone mat on craft table as work surface.
+Resin project in progress on top: silicone molds with colored resin, mixing cups, stir sticks.
+OR hot glue gun with hot glue strings on mat.
+Shows real use case - protection and easy cleanup promise.
+Clean but realistic workshop aesthetic.
+Professional lifestyle photography.
+Aspect ratio: 4:5 portrait.""",
+        "filename": "kk_silicone_mat_workspace",
+        "size": "1024x1024"
+    },
+
+    # =========================================================================
+    # COLLECTION HERO IMAGES (21:9)
+    # =========================================================================
+    "hero-craft-collection": {
+        "prompt": """Wide horizontal hero shot for craft collection page.
+Organized craft workspace - aspirational maker studio aesthetic.
+Clean white desk surface with craft supplies arranged:
+- Stack of white release paper sheets
+- Folded beige PTFE cover sheets with kraft belly band
+- Gray silicone mat rolled at edge
+- Small heat press visible in background (no logos)
+- Colorful stickers, scissors, weeding tools
+
+Soft natural lighting from large window on right.
+Leave clear negative space on left third for text overlay.
+Professional wide-angle lifestyle photography.
+Aspect ratio: 21:9 ultra-wide horizontal.""",
+        "filename": "kk_hero_craft_collection",
+        "size": "1792x1024"
+    },
+
+    "hero-heat-press-collection": {
+        "prompt": """Wide horizontal hero for heat press collection page.
+Heat press workstation - clean, organized, professional but approachable.
+Modern clamshell heat press (no visible brand logos).
+Stack of blank t-shirts (white, black, gray).
+Colorful HTV vinyl rolls stored upright.
+PTFE cover sheets nearby, neatly stacked.
+Maker/small business aesthetic.
+Leave text space on left third.
+Soft studio lighting.
+Aspect ratio: 21:9 ultra-wide horizontal.""",
+        "filename": "kk_hero_heat_press_collection",
+        "size": "1792x1024"
+    },
+
+    "hero-sticker-collection": {
+        "prompt": """Wide horizontal hero for sticker supplies collection page.
+Sticker maker's workspace - colorful, creative, but organized.
+Cutting machine (generic, no brand logos) on white desk.
+Stacked white release paper sheets.
+Sticker storage binder open showing colorful organization.
+Tools: weeding tools, scraper, scissors, tweezers.
+Colorful sticker sheets and vinyl scraps.
+Natural light from window.
+Leave text space on left third.
+Aspect ratio: 21:9 ultra-wide horizontal.""",
+        "filename": "kk_hero_sticker_collection",
+        "size": "1792x1024"
+    },
+
+    "hero-diamond-painting-collection": {
+        "prompt": """Wide horizontal hero for diamond painting collection page.
+Diamond painting workspace - cozy, focused crafting atmosphere.
+Canvas in progress on light pad (glowing softly).
+Stack of 4x4 white release paper squares nearby.
+Diamond drill trays organized by color (rainbow arrangement).
+Applicator pen, wax pad, tweezers arranged neatly.
+Warm, inviting lighting.
+Leave text space on left third.
+Aspect ratio: 21:9 ultra-wide horizontal.""",
+        "filename": "kk_hero_diamond_painting_collection",
+        "size": "1792x1024"
+    },
 }
 
 
-def generate_image(prompt_key: str, prompt_data: dict, size: str = "1024x1024", quality: str = "hd") -> dict:
-    """
-    Generate a single image using DALL-E 3.
+def generate_image(prompt_key: str, prompt_data: dict) -> dict:
+    """Generate a single image using DALL-E 3 with HD quality."""
 
-    Args:
-        prompt_key: Identifier for the prompt
-        prompt_data: Dict containing 'prompt' and 'filename'
-        size: Image size (1024x1024, 1792x1024, or 1024x1792)
-        quality: 'standard' or 'hd' for enhanced detail
-
-    Returns:
-        Dict with generation results
-    """
     print(f"\n{'='*60}")
     print(f"Generating: {prompt_key}")
     print(f"{'='*60}")
+
+    size = prompt_data.get("size", "1024x1024")
 
     try:
         response = client.images.generate(
             model="dall-e-3",
             prompt=prompt_data["prompt"],
             size=size,
-            quality=quality,  # 'hd' for maximum quality
+            quality="hd",  # Always HD for maximum quality
             n=1
         )
 
-        # Get the image URL and revised prompt
         image_url = response.data[0].url
         revised_prompt = response.data[0].revised_prompt
 
-        # Download the image
+        # Download image
         image_response = requests.get(image_url)
         if image_response.status_code == 200:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -145,125 +499,131 @@ def generate_image(prompt_key: str, prompt_data: dict, size: str = "1024x1024", 
             with open(filepath, 'wb') as f:
                 f.write(image_response.content)
 
-            print(f"✓ Saved: {filepath}")
-            print(f"  Revised prompt: {revised_prompt[:100]}...")
+            print(f"  Saved: {filepath}")
+            print(f"  Size: {size}")
+            print(f"  Revised prompt: {revised_prompt[:80]}...")
 
             return {
                 "success": True,
                 "prompt_key": prompt_key,
                 "filepath": str(filepath),
-                "revised_prompt": revised_prompt,
-                "original_prompt": prompt_data["prompt"]
+                "size": size,
+                "revised_prompt": revised_prompt
             }
         else:
-            print(f"✗ Failed to download image")
+            print(f"  Failed to download")
             return {"success": False, "prompt_key": prompt_key, "error": "Download failed"}
 
     except Exception as e:
-        print(f"✗ Error: {str(e)}")
+        print(f"  Error: {str(e)}")
         return {"success": False, "prompt_key": prompt_key, "error": str(e)}
 
 
-def generate_all_images(quality: str = "hd"):
-    """Generate all product images from the prompt list."""
+def generate_category(category: str):
+    """Generate all images for a specific category."""
 
-    if not os.getenv("OPENAI_API_KEY"):
-        print("ERROR: OPENAI_API_KEY not found in environment variables.")
-        print("Create a .env file with: OPENAI_API_KEY=your_key_here")
+    categories = {
+        "homepage": ["homepage-hero"],
+        "tiles": [k for k in PROMPTS.keys() if k.startswith("tile-")],
+        "ptfe": [k for k in PROMPTS.keys() if k.startswith("ptfe-")],
+        "release": [k for k in PROMPTS.keys() if k.startswith("release-")],
+        "diamond": [k for k in PROMPTS.keys() if k.startswith("diamond-")],
+        "mat": [k for k in PROMPTS.keys() if k.startswith("mat-")],
+        "hero": [k for k in PROMPTS.keys() if k.startswith("hero-")],
+    }
+
+    if category not in categories:
+        print(f"Unknown category: {category}")
+        print(f"Available: {list(categories.keys())}")
         return
 
-    print("\n" + "="*60)
-    print("KRAFT & KITCHEN PRODUCT IMAGE GENERATOR")
-    print("="*60)
-    print(f"Output directory: {OUTPUT_DIR.absolute()}")
-    print(f"Quality setting: {quality}")
-    print(f"Total images to generate: {len(PRODUCT_PROMPTS)}")
-    print("="*60)
+    prompts_to_run = categories[category]
+    print(f"\nGenerating {len(prompts_to_run)} images for category: {category}")
 
     results = []
-
-    for prompt_key, prompt_data in PRODUCT_PROMPTS.items():
-        result = generate_image(prompt_key, prompt_data, quality=quality)
+    for key in prompts_to_run:
+        result = generate_image(key, PROMPTS[key])
         results.append(result)
-
-    # Save results log
-    log_file = OUTPUT_DIR / f"generation_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-    with open(log_file, 'w') as f:
-        json.dump(results, f, indent=2)
-
-    # Print summary
-    successful = sum(1 for r in results if r["success"])
-    print("\n" + "="*60)
-    print("GENERATION COMPLETE")
-    print("="*60)
-    print(f"Successful: {successful}/{len(results)}")
-    print(f"Results log: {log_file}")
-    print("="*60)
 
     return results
 
 
-def generate_single(prompt_key: str, quality: str = "hd"):
-    """Generate a single specific image."""
-
+def generate_all():
+    """Generate all images."""
     if not os.getenv("OPENAI_API_KEY"):
-        print("ERROR: OPENAI_API_KEY not found.")
+        print("ERROR: OPENAI_API_KEY not found")
         return
 
-    if prompt_key not in PRODUCT_PROMPTS:
-        print(f"Unknown prompt key: {prompt_key}")
-        print(f"Available keys: {list(PRODUCT_PROMPTS.keys())}")
-        return
+    print(f"\nGenerating {len(PROMPTS)} total images...")
+    print(f"Output: {OUTPUT_DIR.absolute()}")
 
-    return generate_image(prompt_key, PRODUCT_PROMPTS[prompt_key], quality=quality)
+    results = []
+    for key, data in PROMPTS.items():
+        result = generate_image(key, data)
+        results.append(result)
+
+    # Save log
+    log_file = OUTPUT_DIR / f"generation_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    with open(log_file, 'w') as f:
+        json.dump(results, f, indent=2)
+
+    successful = sum(1 for r in results if r["success"])
+    print(f"\n{'='*60}")
+    print(f"Complete: {successful}/{len(results)} successful")
+    print(f"Log: {log_file}")
+
+    return results
 
 
 def list_prompts():
-    """List all available prompts."""
-    print("\nAvailable image prompts:")
-    print("-" * 40)
-    for key, data in PRODUCT_PROMPTS.items():
-        print(f"  {key}")
-        print(f"    -> {data['filename']}")
-    print("-" * 40)
-    print(f"Total: {len(PRODUCT_PROMPTS)} prompts")
+    """List all available prompts organized by category."""
+    print("\nAvailable prompts:")
+    print("-" * 50)
+
+    categories = {}
+    for key in PROMPTS.keys():
+        cat = key.split("-")[0]
+        if cat not in categories:
+            categories[cat] = []
+        categories[cat].append(key)
+
+    for cat, keys in sorted(categories.items()):
+        print(f"\n{cat.upper()} ({len(keys)} prompts):")
+        for key in keys:
+            print(f"  - {key}")
+
+    print(f"\n{'-'*50}")
+    print(f"Total: {len(PROMPTS)} prompts")
 
 
 if __name__ == "__main__":
     import sys
 
     if len(sys.argv) > 1:
-        command = sys.argv[1]
+        cmd = sys.argv[1]
 
-        if command == "list":
+        if cmd == "list":
             list_prompts()
-        elif command == "single" and len(sys.argv) > 2:
-            generate_single(sys.argv[2])
-        elif command == "all":
-            generate_all_images()
+        elif cmd == "single" and len(sys.argv) > 2:
+            key = sys.argv[2]
+            if key in PROMPTS:
+                generate_image(key, PROMPTS[key])
+            else:
+                print(f"Unknown prompt: {key}")
+        elif cmd == "category" and len(sys.argv) > 2:
+            generate_category(sys.argv[2])
+        elif cmd == "all":
+            confirm = input(f"Generate all {len(PROMPTS)} images? (y/n): ")
+            if confirm.lower() == 'y':
+                generate_all()
         else:
             print("Usage:")
-            print("  python generate_images.py list          - List all prompts")
-            print("  python generate_images.py single <key>  - Generate single image")
-            print("  python generate_images.py all           - Generate all images")
+            print("  python generate_images.py list")
+            print("  python generate_images.py single <prompt-key>")
+            print("  python generate_images.py category <category>")
+            print("  python generate_images.py all")
     else:
-        # Interactive mode
-        print("\nKraft & Kitchen Image Generator")
+        print("\nKraft & Kitchen Image Generator v2")
         print("-" * 40)
-        print("1. List available prompts")
-        print("2. Generate single image")
-        print("3. Generate all images")
-        print("-" * 40)
-
-        choice = input("Select option (1-3): ").strip()
-
-        if choice == "1":
-            list_prompts()
-        elif choice == "2":
-            list_prompts()
-            key = input("\nEnter prompt key: ").strip()
-            generate_single(key)
-        elif choice == "3":
-            confirm = input("Generate all images? This may take a while and cost API credits. (y/n): ")
-            if confirm.lower() == 'y':
-                generate_all_images()
+        list_prompts()
+        print("\nRun with: python generate_images.py <command>")
