@@ -1,0 +1,237 @@
+{% comment %}
+  Kraft & Kitchen - Trust Strip Section
+  File: sections/trust-strip.liquid
+
+  Horizontal strip of trust badges and proof points.
+  Shows on homepage and product pages.
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Trust Strip",
+  "tag": "section",
+  "class": "trust-strip-section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#FAF8F5"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#2D2D2D"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Trust Badge",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon (emoji)",
+          "default": "🚚"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Badge Text",
+          "default": "Fast Shipping"
+        },
+        {
+          "type": "text",
+          "id": "subtext",
+          "label": "Subtext (optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Trust Strip",
+      "blocks": [
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "🚚",
+            "text": "Fast Shipping",
+            "subtext": "From Washington"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "⭐",
+            "text": "5-Star Reviews",
+            "subtext": "From real crafters"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "🔒",
+            "text": "Secure Checkout",
+            "subtext": "SSL encrypted"
+          }
+        },
+        {
+          "type": "badge",
+          "settings": {
+            "icon": "💬",
+            "text": "Expert Support",
+            "subtext": "Real craft help"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .trust-strip {
+    background: {{ section.settings.background_color }};
+    padding: 20px 24px;
+    overflow: hidden;
+  }
+
+  .trust-strip__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px 48px;
+  }
+
+  .trust-strip__badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .trust-strip__icon {
+    font-size: 1.75rem;
+    flex-shrink: 0;
+  }
+
+  .trust-strip__content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .trust-strip__text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: {{ section.settings.text_color }};
+    line-height: 1.2;
+  }
+
+  .trust-strip__subtext {
+    font-size: 0.8rem;
+    color: #6B6B6B;
+    margin-top: 2px;
+  }
+
+  /* Dividers between badges on desktop */
+  @media (min-width: 769px) {
+    .trust-strip__badge:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: -24px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 32px;
+      width: 1px;
+      background: #E5E5E5;
+    }
+
+    .trust-strip__badge {
+      position: relative;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .trust-strip {
+      padding: 16px 20px;
+    }
+
+    .trust-strip__container {
+      gap: 12px 24px;
+    }
+
+    .trust-strip__icon {
+      font-size: 1.5rem;
+    }
+
+    .trust-strip__text {
+      font-size: 0.85rem;
+    }
+
+    .trust-strip__subtext {
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Scrolling animation for mobile */
+  @media (max-width: 600px) {
+    .trust-strip__container {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      animation: scroll-badges 20s linear infinite;
+      width: max-content;
+    }
+
+    .trust-strip {
+      overflow: hidden;
+    }
+
+    @keyframes scroll-badges {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .trust-strip:hover .trust-strip__container {
+      animation-play-state: paused;
+    }
+  }
+</style>
+
+{% if section.blocks.size > 0 %}
+<div class="trust-strip">
+  <div class="trust-strip__container">
+    {% for block in section.blocks %}
+      {% if block.type == 'badge' %}
+        <div class="trust-strip__badge" {{ block.shopify_attributes }}>
+          <span class="trust-strip__icon">{{ block.settings.icon }}</span>
+          <div class="trust-strip__content">
+            <span class="trust-strip__text">{{ block.settings.text }}</span>
+            {% if block.settings.subtext != blank %}
+              <span class="trust-strip__subtext">{{ block.settings.subtext }}</span>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    <!-- Duplicate for seamless mobile scroll -->
+    {% for block in section.blocks %}
+      {% if block.type == 'badge' %}
+        <div class="trust-strip__badge" aria-hidden="true">
+          <span class="trust-strip__icon">{{ block.settings.icon }}</span>
+          <div class="trust-strip__content">
+            <span class="trust-strip__text">{{ block.settings.text }}</span>
+            {% if block.settings.subtext != blank %}
+              <span class="trust-strip__subtext">{{ block.settings.subtext }}</span>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

@@ -1,0 +1,534 @@
+{% comment %}
+  Kraft & Kitchen - Product Buy Box Section
+  File: sections/product-buy-box.liquid
+
+  Above-the-fold buy box with:
+  1. Product title (craft language)
+  2. Star rating + review count
+  3. 3 bullet proofs (with icons)
+  4. Variant selection as buttons
+  5. Quantity selector
+  6. Add to cart button
+  7. Shipping note
+  8. "Need help choosing?" link
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Product Buy Box",
+  "tag": "section",
+  "class": "product-buy-box-section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sku",
+      "label": "Show SKU",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "shipping_note",
+      "label": "Shipping Note",
+      "default": "Fast shipping from Washington"
+    },
+    {
+      "type": "url",
+      "id": "size_finder_link",
+      "label": "Size Finder Link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "bullet_proof",
+      "name": "Bullet Proof",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon (emoji or text)",
+          "default": "✓"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Protects your platen from residue"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Buy Box",
+      "blocks": [
+        { "type": "bullet_proof", "settings": { "icon": "🛡️", "text": "Protects platen from residue" } },
+        { "type": "bullet_proof", "settings": { "icon": "♻️", "text": "Reusable hundreds of times" } },
+        { "type": "bullet_proof", "settings": { "icon": "🌡️", "text": "Rated to 500°F (260°C)" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .buy-box {
+    background: white;
+  }
+
+  .buy-box__title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.75rem;
+    line-height: 1.3;
+    color: #2D2D2D;
+    margin: 0 0 8px;
+  }
+
+  .buy-box__vendor {
+    font-size: 0.9rem;
+    color: #6B6B6B;
+    margin-bottom: 8px;
+  }
+
+  .buy-box__rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .buy-box__stars {
+    color: #F59E0B;
+    font-size: 1rem;
+  }
+
+  .buy-box__review-count {
+    font-size: 0.9rem;
+    color: #6B6B6B;
+  }
+
+  .buy-box__review-count a {
+    color: #1A7F7F;
+    text-decoration: none;
+  }
+
+  .buy-box__review-count a:hover {
+    text-decoration: underline;
+  }
+
+  .buy-box__proofs {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .buy-box__proof {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: #2D2D2D;
+  }
+
+  .buy-box__proof-icon {
+    font-size: 1.1rem;
+    width: 24px;
+    text-align: center;
+  }
+
+  .buy-box__price {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2D2D2D;
+    margin-bottom: 20px;
+  }
+
+  .buy-box__price-compare {
+    font-size: 1rem;
+    color: #9A9A9A;
+    text-decoration: line-through;
+    margin-left: 8px;
+    font-weight: 400;
+  }
+
+  .buy-box__variants {
+    margin-bottom: 20px;
+  }
+
+  .buy-box__variant-group {
+    margin-bottom: 16px;
+  }
+
+  .buy-box__variant-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2D2D2D;
+    margin-bottom: 8px;
+  }
+
+  .buy-box__variant-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .buy-box__variant-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    height: 44px;
+    padding: 0 16px;
+    border: 2px solid #E5E5E5;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #2D2D2D;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .buy-box__variant-btn:hover {
+    border-color: #1A7F7F;
+  }
+
+  .buy-box__variant-btn.is-active {
+    border-color: #1A7F7F;
+    background: #E6F3F3;
+    color: #1A7F7F;
+  }
+
+  .buy-box__variant-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .buy-box__quantity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .buy-box__quantity-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2D2D2D;
+  }
+
+  .buy-box__quantity-selector {
+    display: flex;
+    align-items: center;
+    border: 2px solid #E5E5E5;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .buy-box__quantity-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: white;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .buy-box__quantity-btn:hover {
+    background: #FAF8F5;
+  }
+
+  .buy-box__quantity-input {
+    width: 50px;
+    height: 44px;
+    border: none;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  .buy-box__quantity-input::-webkit-inner-spin-button,
+  .buy-box__quantity-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .buy-box__add-to-cart {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 8px;
+    background: #1A7F7F;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-bottom: 12px;
+  }
+
+  .buy-box__add-to-cart:hover {
+    background: #156666;
+  }
+
+  .buy-box__add-to-cart:disabled {
+    background: #9A9A9A;
+    cursor: not-allowed;
+  }
+
+  .buy-box__shipping-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #6B6B6B;
+    margin-bottom: 16px;
+  }
+
+  .buy-box__shipping-icon {
+    font-size: 1rem;
+  }
+
+  .buy-box__help-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: #1A7F7F;
+    text-decoration: none;
+  }
+
+  .buy-box__help-link:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 768px) {
+    .buy-box__title {
+      font-size: 1.5rem;
+    }
+
+    .buy-box__variant-buttons {
+      gap: 6px;
+    }
+
+    .buy-box__variant-btn {
+      min-width: 50px;
+      height: 40px;
+      padding: 0 12px;
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+{%- assign product = product -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<div class="buy-box" data-product-id="{{ product.id }}">
+
+  <!-- Title -->
+  <h1 class="buy-box__title">{{ product.title }}</h1>
+
+  {% if section.settings.show_vendor and product.vendor %}
+    <p class="buy-box__vendor">{{ product.vendor }}</p>
+  {% endif %}
+
+  <!-- Rating (placeholder - connect to your reviews app) -->
+  <div class="buy-box__rating">
+    <span class="buy-box__stars">★★★★★</span>
+    <span class="buy-box__review-count">
+      <a href="#reviews">0 reviews</a>
+    </span>
+  </div>
+
+  <!-- Bullet Proofs -->
+  {% if section.blocks.size > 0 %}
+    <ul class="buy-box__proofs">
+      {% for block in section.blocks %}
+        {% if block.type == 'bullet_proof' %}
+          <li class="buy-box__proof" {{ block.shopify_attributes }}>
+            <span class="buy-box__proof-icon">{{ block.settings.icon }}</span>
+            <span>{{ block.settings.text }}</span>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <!-- Price -->
+  <div class="buy-box__price">
+    {{ current_variant.price | money }}
+    {% if current_variant.compare_at_price > current_variant.price %}
+      <span class="buy-box__price-compare">{{ current_variant.compare_at_price | money }}</span>
+    {% endif %}
+  </div>
+
+  <!-- Variants -->
+  {% if product.has_only_default_variant == false %}
+    <div class="buy-box__variants">
+      {% for option in product.options_with_values %}
+        <div class="buy-box__variant-group">
+          <span class="buy-box__variant-label">{{ option.name }}</span>
+          <div class="buy-box__variant-buttons" data-option-index="{{ forloop.index0 }}">
+            {% for value in option.values %}
+              <button
+                type="button"
+                class="buy-box__variant-btn {% if option.selected_value == value %}is-active{% endif %}"
+                data-value="{{ value }}"
+              >
+                {{ value }}
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Quantity -->
+  <div class="buy-box__quantity">
+    <span class="buy-box__quantity-label">Quantity</span>
+    <div class="buy-box__quantity-selector">
+      <button type="button" class="buy-box__quantity-btn" data-action="decrease">−</button>
+      <input
+        type="number"
+        class="buy-box__quantity-input"
+        name="quantity"
+        value="1"
+        min="1"
+        aria-label="Quantity"
+      >
+      <button type="button" class="buy-box__quantity-btn" data-action="increase">+</button>
+    </div>
+  </div>
+
+  <!-- Add to Cart Form -->
+  <form method="post" action="/cart/add" id="product-form-{{ product.id }}">
+    <input type="hidden" name="id" value="{{ current_variant.id }}">
+    <input type="hidden" name="quantity" value="1" class="quantity-hidden">
+
+    <button
+      type="submit"
+      class="buy-box__add-to-cart"
+      {% unless current_variant.available %}disabled{% endunless %}
+    >
+      {% if current_variant.available %}
+        Add to Cart
+      {% else %}
+        Sold Out
+      {% endif %}
+    </button>
+  </form>
+
+  <!-- Shipping Note -->
+  {% if section.settings.shipping_note %}
+    <p class="buy-box__shipping-note">
+      <span class="buy-box__shipping-icon">🚚</span>
+      {{ section.settings.shipping_note }}
+    </p>
+  {% endif %}
+
+  <!-- Help Link -->
+  {% if section.settings.size_finder_link %}
+    <a href="{{ section.settings.size_finder_link }}" class="buy-box__help-link">
+      <span>Need help choosing?</span>
+      <span>→</span>
+    </a>
+  {% endif %}
+
+</div>
+
+<script>
+  (function() {
+    const buyBox = document.querySelector('.buy-box');
+    if (!buyBox) return;
+
+    const form = buyBox.querySelector('form');
+    const variantInput = form.querySelector('input[name="id"]');
+    const quantityInput = buyBox.querySelector('.buy-box__quantity-input');
+    const quantityHidden = form.querySelector('.quantity-hidden');
+    const addToCartBtn = buyBox.querySelector('.buy-box__add-to-cart');
+    const priceEl = buyBox.querySelector('.buy-box__price');
+
+    // Variant data from Shopify
+    const variants = {{ product.variants | json }};
+
+    // Quantity buttons
+    buyBox.querySelectorAll('.buy-box__quantity-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        let value = parseInt(quantityInput.value) || 1;
+        if (btn.dataset.action === 'increase') {
+          value++;
+        } else if (btn.dataset.action === 'decrease' && value > 1) {
+          value--;
+        }
+        quantityInput.value = value;
+        quantityHidden.value = value;
+      });
+    });
+
+    quantityInput.addEventListener('change', () => {
+      let value = parseInt(quantityInput.value) || 1;
+      if (value < 1) value = 1;
+      quantityInput.value = value;
+      quantityHidden.value = value;
+    });
+
+    // Variant selection
+    const optionGroups = buyBox.querySelectorAll('.buy-box__variant-buttons');
+    optionGroups.forEach(group => {
+      group.querySelectorAll('.buy-box__variant-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Update active state
+          group.querySelectorAll('.buy-box__variant-btn').forEach(b => b.classList.remove('is-active'));
+          btn.classList.add('is-active');
+
+          // Get selected options
+          const selectedOptions = [];
+          optionGroups.forEach(g => {
+            const active = g.querySelector('.is-active');
+            if (active) selectedOptions.push(active.dataset.value);
+          });
+
+          // Find matching variant
+          const selectedVariant = variants.find(v => {
+            return v.options.every((opt, i) => opt === selectedOptions[i]);
+          });
+
+          if (selectedVariant) {
+            // Update hidden input
+            variantInput.value = selectedVariant.id;
+
+            // Update price
+            const price = Shopify.formatMoney ? Shopify.formatMoney(selectedVariant.price) : '$' + (selectedVariant.price / 100).toFixed(2);
+            priceEl.innerHTML = price;
+
+            // Update button
+            if (selectedVariant.available) {
+              addToCartBtn.disabled = false;
+              addToCartBtn.textContent = 'Add to Cart';
+            } else {
+              addToCartBtn.disabled = true;
+              addToCartBtn.textContent = 'Sold Out';
+            }
+
+            // Update URL
+            const url = new URL(window.location);
+            url.searchParams.set('variant', selectedVariant.id);
+            window.history.replaceState({}, '', url);
+          }
+        });
+      });
+    });
+  })();
+</script>

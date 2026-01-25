@@ -1,0 +1,272 @@
+{% comment %}
+  Kraft & Kitchen - Product FAQs Section
+  File: sections/product-faqs.liquid
+
+  Accordion-style FAQs with schema.org markup for SEO.
+  Questions can be added via theme editor blocks.
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Product FAQs",
+  "tag": "section",
+  "class": "product-faqs-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Common Questions"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Quick answers about this product"
+    },
+    {
+      "type": "checkbox",
+      "id": "start_open",
+      "label": "Start with first FAQ open",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "How do I use this product?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Follow the included instructions for best results.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product FAQs",
+      "blocks": [
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Will this change my press settings?",
+            "answer": "<p>The cover sheet adds a thin barrier. You may need 2-3 extra seconds of press time. Always test with your specific materials.</p>"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Is this the same as a Teflon sheet?",
+            "answer": "<p>Yes. PTFE is the material used in Teflon (a DuPont brand name). \"PTFE sheet,\" \"Teflon sheet,\" and \"cover sheet\" all refer to this type of product.</p>"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "How many times can I reuse it?",
+            "answer": "<p>Hundreds of times with proper care. Replace when creased, torn, or the surface becomes rough.</p>"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "What size should I get?",
+            "answer": "<p>Match your heat press size. 16x20 fits most standard presses. 18x20 works for larger commercial presses.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .product-faqs {
+    margin: 48px 0;
+    padding: 32px 0;
+    border-top: 1px solid #E5E5E5;
+  }
+
+  .product-faqs__header {
+    margin-bottom: 24px;
+  }
+
+  .product-faqs__heading {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.5rem;
+    color: #2D2D2D;
+    margin: 0 0 8px;
+  }
+
+  .product-faqs__subheading {
+    font-size: 0.95rem;
+    color: #6B6B6B;
+    margin: 0;
+  }
+
+  .product-faqs__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .product-faqs__item {
+    border-bottom: 1px solid #E5E5E5;
+  }
+
+  .product-faqs__question {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2D2D2D;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .product-faqs__question:hover {
+    color: #1A7F7F;
+  }
+
+  .product-faqs__icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: #1A7F7F;
+    transition: transform 0.2s ease;
+  }
+
+  .product-faqs__item.is-open .product-faqs__icon {
+    transform: rotate(45deg);
+  }
+
+  .product-faqs__answer {
+    display: none;
+    padding: 0 0 16px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #4A4A4A;
+  }
+
+  .product-faqs__answer p {
+    margin: 0 0 12px;
+  }
+
+  .product-faqs__answer p:last-child {
+    margin-bottom: 0;
+  }
+
+  .product-faqs__item.is-open .product-faqs__answer {
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .product-faqs {
+      margin: 32px 0;
+      padding: 24px 0;
+    }
+
+    .product-faqs__heading {
+      font-size: 1.25rem;
+    }
+
+    .product-faqs__question {
+      font-size: 0.95rem;
+      padding: 14px 0;
+    }
+  }
+</style>
+
+{% if section.blocks.size > 0 %}
+<div class="product-faqs" itemscope itemtype="https://schema.org/FAQPage">
+
+  <div class="product-faqs__header">
+    {% if section.settings.heading != blank %}
+      <h2 class="product-faqs__heading">{{ section.settings.heading }}</h2>
+    {% endif %}
+    {% if section.settings.subheading != blank %}
+      <p class="product-faqs__subheading">{{ section.settings.subheading }}</p>
+    {% endif %}
+  </div>
+
+  <ul class="product-faqs__list">
+    {% for block in section.blocks %}
+      {% if block.type == 'faq' %}
+        <li
+          class="product-faqs__item {% if forloop.first and section.settings.start_open %}is-open{% endif %}"
+          itemscope
+          itemprop="mainEntity"
+          itemtype="https://schema.org/Question"
+          {{ block.shopify_attributes }}
+        >
+          <button
+            type="button"
+            class="product-faqs__question"
+            aria-expanded="{% if forloop.first and section.settings.start_open %}true{% else %}false{% endif %}"
+          >
+            <span itemprop="name">{{ block.settings.question }}</span>
+            <span class="product-faqs__icon">+</span>
+          </button>
+          <div
+            class="product-faqs__answer"
+            itemscope
+            itemprop="acceptedAnswer"
+            itemtype="https://schema.org/Answer"
+          >
+            <div itemprop="text">
+              {{ block.settings.answer }}
+            </div>
+          </div>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+
+</div>
+
+<script>
+  (function() {
+    const faqSection = document.querySelector('.product-faqs');
+    if (!faqSection) return;
+
+    faqSection.querySelectorAll('.product-faqs__question').forEach(button => {
+      button.addEventListener('click', () => {
+        const item = button.closest('.product-faqs__item');
+        const isOpen = item.classList.contains('is-open');
+
+        // Close all others (accordion behavior)
+        faqSection.querySelectorAll('.product-faqs__item').forEach(otherItem => {
+          otherItem.classList.remove('is-open');
+          otherItem.querySelector('.product-faqs__question').setAttribute('aria-expanded', 'false');
+        });
+
+        // Toggle current
+        if (!isOpen) {
+          item.classList.add('is-open');
+          button.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  })();
+</script>
+{% endif %}
