@@ -4,10 +4,17 @@ Kraft & Kitchen - Nano Banana Pro Image Generator
 Uses Google Gemini 3 Pro Image API for AI-powered product photography
 
 Features:
+- Oil Slick Pad reference images (same products, different niche)
+- Niche transformation: Extraction/Smokeshop → Craft/Maker aesthetic
 - Competitor reference image search (DuckDuckGo)
 - Multi-image generation with variants
 - Direct Shopify product upload
 - 2K/4K output quality
+
+IMPORTANT: Oil Slick Pad (oilslickpad.com) sells the SAME physical products
+as Kraft & Kitchen, but positioned for the extraction/smokeshop market.
+We use their product images as references, then transform the aesthetic
+to the craft/maker niche (heat press, stickers, diamond painting, resin crafts).
 
 Usage:
   python nano_banana_generator.py --preset ptfe-sheets --upload
@@ -68,6 +75,72 @@ OUTPUT_DIR = Path("generated_images")
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 # =============================================================================
+# OIL SLICK PAD REFERENCE CONFIGURATION
+# =============================================================================
+# Oil Slick Pad (oilslickpad.com) sells identical PTFE and silicone products
+# but for the extraction/smokeshop niche. We use their product photography
+# as reference images, then transform to the craft/maker aesthetic.
+
+OILSLICKPAD_REFERENCES = {
+    "ptfe": {
+        "description": "PTFE/Teflon sheets - same material, different application",
+        "search_terms": [
+            "site:oilslickpad.com PTFE sheet",
+            "Oil Slick Pad PTFE product",
+            "oilslickpad teflon sheet",
+            "oil slick PTFE concentrate pad"
+        ],
+        "direct_urls": [
+            # Add direct product image URLs from oilslickpad.com here
+            # These will be fetched as primary references
+        ]
+    },
+    "silicone": {
+        "description": "Silicone mats and pads - same material, different application",
+        "search_terms": [
+            "site:oilslickpad.com silicone mat",
+            "Oil Slick Pad silicone",
+            "oilslickpad silicone pad",
+            "oil slick silicone concentrate mat"
+        ],
+        "direct_urls": []
+    },
+    "parchment": {
+        "description": "Parchment/release paper - same material, different application",
+        "search_terms": [
+            "site:oilslickpad.com parchment paper",
+            "Oil Slick Pad release paper",
+            "oilslickpad parchment sheets",
+            "oil slick extraction paper"
+        ],
+        "direct_urls": []
+    }
+}
+
+# Niche transformation instruction - added to ALL prompts
+NICHE_TRANSFORMATION = """
+IMPORTANT CONTEXT: The reference images show products from the extraction/concentrate industry.
+You must TRANSFORM the aesthetic for the CRAFT/MAKER market:
+
+FROM (extraction niche - DO NOT include):
+- Dark/moody lighting
+- Cannabis/extraction imagery
+- Dab tools, concentrate containers
+- Smokeshop aesthetic
+- Any drug-related context
+
+TO (craft niche - USE THIS aesthetic):
+- Bright, clean studio lighting
+- Warm, inviting maker workspace
+- Craft tools: heat press, cutting machine, stickers, vinyl
+- Family-friendly DIY/craft aesthetic
+- Props: t-shirts, sticker sheets, diamond painting, resin molds
+
+Keep the PRODUCT appearance (PTFE texture, silicone flexibility, paper sheen)
+but completely change the CONTEXT and STYLING to craft/maker market.
+"""
+
+# =============================================================================
 # KRAFT & KITCHEN PRODUCT PRESETS
 # =============================================================================
 
@@ -75,7 +148,12 @@ PRODUCT_PRESETS = {
     "ptfe-sheets": {
         "name": "PTFE Heat Press Cover Sheets",
         "product_id": None,  # Set your Shopify product ID here
+        "oilslickpad_ref": "ptfe",  # Reference key for OILSLICKPAD_REFERENCES
         "search_terms": [
+            # Oil Slick Pad references (same product, extraction niche)
+            "site:oilslickpad.com PTFE sheet",
+            "Oil Slick Pad PTFE product",
+            # Craft niche competitors
             "PTFE heat press cover sheet product photo",
             "teflon sheet heat press white background",
             "heat press protective sheet professional photography",
@@ -104,7 +182,12 @@ CRITICAL: ABSOLUTELY NO text, watermarks, labels, logos, or branding of any kind
     "release-paper-letter": {
         "name": "Silicone Release Paper - Letter Size",
         "product_id": None,
+        "oilslickpad_ref": "parchment",  # Reference key for OILSLICKPAD_REFERENCES
         "search_terms": [
+            # Oil Slick Pad references (same product, extraction niche)
+            "site:oilslickpad.com parchment paper",
+            "Oil Slick Pad release paper",
+            # Craft niche competitors
             "silicone release paper stack product photo",
             "parchment paper sheets white background",
             "release liner paper professional photography",
@@ -134,7 +217,12 @@ CRITICAL: ABSOLUTELY NO text, watermarks, labels, logos, or branding of any kind
     "diamond-painting-squares": {
         "name": "Diamond Painting Release Paper Squares",
         "product_id": None,
+        "oilslickpad_ref": "parchment",  # Reference key for OILSLICKPAD_REFERENCES
         "search_terms": [
+            # Oil Slick Pad references (same product, extraction niche)
+            "site:oilslickpad.com parchment squares",
+            "Oil Slick Pad small sheets",
+            # Craft niche competitors
             "diamond painting cover paper product photo",
             "release paper squares craft supplies",
             "diamond art protective sheets white background",
@@ -161,7 +249,13 @@ CRITICAL: ABSOLUTELY NO text, watermarks, labels, logos, or branding of any kind
     "silicone-mats": {
         "name": "Silicone Work Mats",
         "product_id": None,
+        "oilslickpad_ref": "silicone",  # Reference key for OILSLICKPAD_REFERENCES
         "search_terms": [
+            # Oil Slick Pad references (same product, extraction niche)
+            "site:oilslickpad.com silicone mat",
+            "Oil Slick Pad silicone",
+            "oilslickpad silicone pad",
+            # Craft niche competitors
             "silicone craft mat product photo",
             "resin work mat white background",
             "silicone baking mat professional photography",
@@ -189,6 +283,7 @@ CRITICAL: ABSOLUTELY NO text, watermarks, labels, logos, or branding of any kind
     "homepage-hero": {
         "name": "Homepage Hero Images",
         "product_id": None,
+        "oilslickpad_ref": None,  # Hero images don't need extraction refs
         "search_terms": [
             "craft workspace flat lay product photography",
             "heat press studio professional photo",
@@ -218,6 +313,7 @@ CRITICAL: ABSOLUTELY NO text, watermarks, labels, logos, or branding of any kind
     "project-tiles": {
         "name": "Shop By Project Tiles",
         "product_id": None,
+        "oilslickpad_ref": None,  # Project tiles don't need extraction refs
         "search_terms": [
             "craft project flat lay photography",
             "sticker collection aesthetic photo",
@@ -497,8 +593,23 @@ def generate_from_preset(preset_key: str, upload: bool = False, model_key: str =
     print(f"🎯 Generating images for: {preset['name']}")
     print(f"{'='*60}")
 
+    # Check if this preset uses Oil Slick Pad references
+    oilslickpad_ref = preset.get("oilslickpad_ref")
+    use_niche_transformation = oilslickpad_ref is not None
+
+    if use_niche_transformation:
+        print(f"   🔄 Using Oil Slick Pad references (niche: {oilslickpad_ref})")
+        print(f"   🎨 Will transform from extraction → craft aesthetic")
+
+    # Build search terms, prioritizing Oil Slick Pad if available
+    search_terms = list(preset.get("search_terms", []))
+    if oilslickpad_ref and oilslickpad_ref in OILSLICKPAD_REFERENCES:
+        osp_terms = OILSLICKPAD_REFERENCES[oilslickpad_ref]["search_terms"]
+        # Prioritize Oil Slick Pad terms by putting them first
+        search_terms = osp_terms + search_terms
+
     # Search for competitor reference images
-    reference_urls = search_competitor_images(preset.get("search_terms", []))
+    reference_urls = search_competitor_images(search_terms)
 
     # Download reference images
     reference_images = []
@@ -533,6 +644,12 @@ def generate_from_preset(preset_key: str, upload: bool = False, model_key: str =
 
         # Clean up any remaining placeholders
         prompt = re.sub(r'\{[^}]+\}', '', prompt)
+
+        # Add NICHE_TRANSFORMATION instruction when using Oil Slick Pad references
+        # This instructs the AI to transform extraction/smokeshop aesthetic to craft/maker
+        if use_niche_transformation:
+            prompt = NICHE_TRANSFORMATION + "\n\n" + prompt
+            print(f"   🔄 Applied niche transformation (extraction → craft)")
 
         # Generate multiple images per variant
         num_images = preset.get("num_images", 1)
