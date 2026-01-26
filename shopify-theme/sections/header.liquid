@@ -1,0 +1,682 @@
+{% comment %}
+  Kraft & Kitchen - Header Section
+  Includes: Announcement bar, Logo, Navigation, Cart
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Header",
+  "tag": "header",
+  "class": "site-header-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 80,
+      "max": 200,
+      "step": 10,
+      "default": 120,
+      "label": "Logo width (px)"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Main menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "Show announcement bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "announcement_text",
+      "label": "Announcement text",
+      "default": "Free shipping on orders over $35!"
+    },
+    {
+      "type": "url",
+      "id": "announcement_link",
+      "label": "Announcement link"
+    },
+    {
+      "type": "color",
+      "id": "announcement_bg",
+      "label": "Announcement background",
+      "default": "#1A7F7F"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_header",
+      "label": "Sticky header",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "mega_menu",
+      "name": "Mega Menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_title",
+          "label": "Menu title (must match menu item)",
+          "default": "Shop"
+        },
+        {
+          "type": "link_list",
+          "id": "column_1_links",
+          "label": "Column 1 links"
+        },
+        {
+          "type": "text",
+          "id": "column_1_title",
+          "label": "Column 1 title",
+          "default": "By Project"
+        },
+        {
+          "type": "link_list",
+          "id": "column_2_links",
+          "label": "Column 2 links"
+        },
+        {
+          "type": "text",
+          "id": "column_2_title",
+          "label": "Column 2 title",
+          "default": "By Product"
+        },
+        {
+          "type": "link_list",
+          "id": "column_3_links",
+          "label": "Column 3 links"
+        },
+        {
+          "type": "text",
+          "id": "column_3_title",
+          "label": "Column 3 title",
+          "default": "Resources"
+        },
+        {
+          "type": "product",
+          "id": "featured_product",
+          "label": "Featured product"
+        },
+        {
+          "type": "text",
+          "id": "featured_badge",
+          "label": "Featured badge text",
+          "default": "Best Seller"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .site-header {
+    background: var(--color-background);
+    position: relative;
+    z-index: 1000;
+  }
+
+  .site-header.is-sticky {
+    position: sticky;
+    top: 0;
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Announcement Bar */
+  .announcement-bar {
+    background: {{ section.settings.announcement_bg }};
+    color: white;
+    text-align: center;
+    padding: 10px var(--space-lg);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .announcement-bar a {
+    color: white;
+    text-decoration: underline;
+  }
+
+  .announcement-bar a:hover {
+    text-decoration: none;
+  }
+
+  /* Main Header */
+  .header-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-md) var(--space-lg);
+    max-width: var(--container-max);
+    margin: 0 auto;
+    gap: var(--space-xl);
+  }
+
+  /* Logo */
+  .header-logo {
+    flex-shrink: 0;
+  }
+
+  .header-logo img {
+    width: {{ section.settings.logo_width }}px;
+    height: auto;
+  }
+
+  .header-logo-text {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  /* Navigation */
+  .header-nav {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .header-nav__list {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xl);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .header-nav__item {
+    position: relative;
+  }
+
+  .header-nav__link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: var(--space-sm) 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .header-nav__link:hover,
+  .header-nav__item:hover .header-nav__link {
+    color: var(--color-primary);
+  }
+
+  .header-nav__link svg {
+    width: 12px;
+    height: 12px;
+    transition: transform var(--transition-fast);
+  }
+
+  .header-nav__item:hover .header-nav__link svg {
+    transform: rotate(180deg);
+  }
+
+  /* Mega Menu */
+  .mega-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    padding: var(--space-xl);
+    min-width: 700px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
+  }
+
+  .header-nav__item:hover .mega-menu {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mega-menu__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .mega-menu__column h4 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--color-primary);
+  }
+
+  .mega-menu__column ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .mega-menu__column li {
+    margin-bottom: var(--space-sm);
+  }
+
+  .mega-menu__column a {
+    font-size: 0.9rem;
+    color: var(--color-text);
+    transition: color var(--transition-fast);
+  }
+
+  .mega-menu__column a:hover {
+    color: var(--color-primary);
+  }
+
+  /* Featured Product in Mega Menu */
+  .mega-menu__featured {
+    background: var(--color-background-warm);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    text-align: center;
+  }
+
+  .mega-menu__featured-badge {
+    display: inline-block;
+    background: var(--color-primary);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+    margin-bottom: var(--space-sm);
+  }
+
+  .mega-menu__featured img {
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-sm);
+  }
+
+  .mega-menu__featured-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0 0 var(--space-xs);
+  }
+
+  .mega-menu__featured-price {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  /* Header Actions */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .header-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    color: var(--color-text);
+    transition: background var(--transition-fast), color var(--transition-fast);
+    position: relative;
+  }
+
+  .header-action:hover {
+    background: var(--color-background-warm);
+    color: var(--color-primary);
+  }
+
+  .header-action svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .header-action__count {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: var(--color-primary);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Mobile Menu Toggle */
+  .header-menu-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    padding: var(--space-sm);
+    cursor: pointer;
+  }
+
+  .header-menu-toggle svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Mobile Styles */
+  @media (max-width: 991px) {
+    .header-nav {
+      display: none;
+    }
+
+    .header-menu-toggle {
+      display: block;
+    }
+
+    .header-main {
+      padding: var(--space-sm) var(--space-md);
+    }
+  }
+
+  /* Mobile Navigation Drawer */
+  .mobile-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-width: 320px;
+    height: 100%;
+    background: var(--color-background);
+    z-index: 2000;
+    transform: translateX(-100%);
+    transition: transform var(--transition-slow);
+    overflow-y: auto;
+  }
+
+  .mobile-nav.is-open {
+    transform: translateX(0);
+  }
+
+  .mobile-nav__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .mobile-nav__close {
+    background: transparent;
+    border: none;
+    padding: var(--space-sm);
+    cursor: pointer;
+  }
+
+  .mobile-nav__list {
+    list-style: none;
+    margin: 0;
+    padding: var(--space-md);
+  }
+
+  .mobile-nav__item {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .mobile-nav__link {
+    display: block;
+    padding: var(--space-md) 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .mobile-nav__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
+  }
+
+  .mobile-nav__overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+</style>
+
+<div class="site-header{% if section.settings.sticky_header %} is-sticky{% endif %}">
+
+  {% if section.settings.show_announcement and section.settings.announcement_text != blank %}
+    <div class="announcement-bar">
+      {% if section.settings.announcement_link != blank %}
+        <a href="{{ section.settings.announcement_link }}">{{ section.settings.announcement_text }}</a>
+      {% else %}
+        {{ section.settings.announcement_text }}
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="header-main">
+
+    <!-- Mobile Menu Toggle -->
+    <button class="header-menu-toggle" aria-label="Open menu" data-mobile-menu-toggle>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"></path>
+      </svg>
+    </button>
+
+    <!-- Logo -->
+    <div class="header-logo">
+      <a href="{{ routes.root_url }}">
+        {% if section.settings.logo %}
+          <img src="{{ section.settings.logo | img_url: 'x80' }}" alt="{{ shop.name }}">
+        {% else %}
+          <span class="header-logo-text">{{ shop.name }}</span>
+        {% endif %}
+      </a>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <nav class="header-nav" aria-label="Main navigation">
+      <ul class="header-nav__list">
+        {% for link in linklists[section.settings.menu].links %}
+          <li class="header-nav__item">
+            <a href="{{ link.url }}" class="header-nav__link">
+              {{ link.title }}
+              {% if link.links.size > 0 %}
+                <svg viewBox="0 0 12 12" fill="currentColor">
+                  <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                </svg>
+              {% endif %}
+            </a>
+
+            {% comment %} Check for mega menu block {% endcomment %}
+            {% for block in section.blocks %}
+              {% if block.type == 'mega_menu' and block.settings.menu_title == link.title %}
+                <div class="mega-menu" {{ block.shopify_attributes }}>
+                  <div class="mega-menu__grid">
+
+                    {% if block.settings.column_1_links != blank %}
+                      <div class="mega-menu__column">
+                        <h4>{{ block.settings.column_1_title }}</h4>
+                        <ul>
+                          {% for col_link in linklists[block.settings.column_1_links].links %}
+                            <li><a href="{{ col_link.url }}">{{ col_link.title }}</a></li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                    {% endif %}
+
+                    {% if block.settings.column_2_links != blank %}
+                      <div class="mega-menu__column">
+                        <h4>{{ block.settings.column_2_title }}</h4>
+                        <ul>
+                          {% for col_link in linklists[block.settings.column_2_links].links %}
+                            <li><a href="{{ col_link.url }}">{{ col_link.title }}</a></li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                    {% endif %}
+
+                    {% if block.settings.column_3_links != blank %}
+                      <div class="mega-menu__column">
+                        <h4>{{ block.settings.column_3_title }}</h4>
+                        <ul>
+                          {% for col_link in linklists[block.settings.column_3_links].links %}
+                            <li><a href="{{ col_link.url }}">{{ col_link.title }}</a></li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                    {% endif %}
+
+                    {% if block.settings.featured_product != blank %}
+                      <div class="mega-menu__column">
+                        <div class="mega-menu__featured">
+                          {% if block.settings.featured_badge != blank %}
+                            <span class="mega-menu__featured-badge">{{ block.settings.featured_badge }}</span>
+                          {% endif %}
+                          {% assign featured = block.settings.featured_product %}
+                          <a href="{{ featured.url }}">
+                            <img src="{{ featured.featured_image | img_url: '200x200', crop: 'center' }}" alt="{{ featured.title }}">
+                            <p class="mega-menu__featured-title">{{ featured.title }}</p>
+                            <p class="mega-menu__featured-price">{{ featured.price | money }}</p>
+                          </a>
+                        </div>
+                      </div>
+                    {% endif %}
+
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+
+            {% comment %} Default dropdown for items without mega menu {% endcomment %}
+            {% if link.links.size > 0 %}
+              {% assign has_mega = false %}
+              {% for block in section.blocks %}
+                {% if block.type == 'mega_menu' and block.settings.menu_title == link.title %}
+                  {% assign has_mega = true %}
+                {% endif %}
+              {% endfor %}
+              {% unless has_mega %}
+                <div class="mega-menu" style="min-width: 200px;">
+                  <div class="mega-menu__column">
+                    <ul>
+                      {% for child_link in link.links %}
+                        <li><a href="{{ child_link.url }}">{{ child_link.title }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              {% endunless %}
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <a href="{{ routes.search_url }}" class="header-action" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="M21 21l-4.35-4.35"></path>
+        </svg>
+      </a>
+
+      <a href="{{ routes.account_url }}" class="header-action" aria-label="Account">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </a>
+
+      <button class="header-action" aria-label="Cart" data-cart-toggle>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        <span class="header-action__count" data-cart-count>{{ cart.item_count }}</span>
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Mobile Navigation -->
+<div class="mobile-nav__overlay" data-mobile-nav-overlay></div>
+<nav class="mobile-nav" aria-label="Mobile navigation" data-mobile-nav>
+  <div class="mobile-nav__header">
+    <span class="header-logo-text">{{ shop.name }}</span>
+    <button class="mobile-nav__close" aria-label="Close menu" data-mobile-menu-close>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+        <path d="M18 6L6 18M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+  <ul class="mobile-nav__list">
+    {% for link in linklists[section.settings.menu].links %}
+      <li class="mobile-nav__item">
+        <a href="{{ link.url }}" class="mobile-nav__link">{{ link.title }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>
+
+<script>
+  (function() {
+    const mobileNav = document.querySelector('[data-mobile-nav]');
+    const overlay = document.querySelector('[data-mobile-nav-overlay]');
+    const openBtn = document.querySelector('[data-mobile-menu-toggle]');
+    const closeBtn = document.querySelector('[data-mobile-menu-close]');
+
+    function openMobileNav() {
+      mobileNav.classList.add('is-open');
+      overlay.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileNav() {
+      mobileNav.classList.remove('is-open');
+      overlay.classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openMobileNav);
+    if (closeBtn) closeBtn.addEventListener('click', closeMobileNav);
+    if (overlay) overlay.addEventListener('click', closeMobileNav);
+  })();
+</script>
