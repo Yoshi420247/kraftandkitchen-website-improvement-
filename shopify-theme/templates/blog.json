@@ -1,0 +1,24 @@
+{
+  "sections": {
+    "blog-header": {
+      "type": "blog-header",
+      "settings": {
+        "heading": "Craft Tips & Guides",
+        "subheading": "Learn techniques, get project ideas, and master your craft supplies."
+      }
+    },
+    "blog-posts": {
+      "type": "blog-posts",
+      "settings": {
+        "posts_per_page": 9,
+        "show_author": true,
+        "show_date": true,
+        "show_excerpt": true
+      }
+    }
+  },
+  "order": [
+    "blog-header",
+    "blog-posts"
+  ]
+}

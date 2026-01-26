@@ -1,0 +1,475 @@
+{% comment %}
+  Kraft & Kitchen - FAQ Page Template
+  Assign to a page with handle "faq"
+{% endcomment %}
+
+<style>
+  .faq-page {
+    padding: var(--space-3xl) var(--space-lg);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .faq-header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+  }
+
+  .faq-header__title {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    margin: 0 0 var(--space-md);
+  }
+
+  .faq-header__subtitle {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+  }
+
+  .faq-search {
+    max-width: 500px;
+    margin: 0 auto var(--space-3xl);
+    position: relative;
+  }
+
+  .faq-search__input {
+    width: 100%;
+    padding: var(--space-md) var(--space-lg) var(--space-md) 48px;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    transition: border-color var(--transition-fast);
+  }
+
+  .faq-search__input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .faq-search__icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+  }
+
+  .faq-categories {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-2xl);
+  }
+
+  .faq-category-btn {
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .faq-category-btn:hover,
+  .faq-category-btn.is-active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+  }
+
+  .faq-section {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .faq-section__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--color-primary);
+  }
+
+  .faq-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-sm);
+    overflow: hidden;
+  }
+
+  .faq-item__question {
+    width: 100%;
+    padding: var(--space-lg);
+    background: var(--color-background);
+    border: none;
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+    transition: background var(--transition-fast);
+  }
+
+  .faq-item__question:hover {
+    background: var(--color-background-warm);
+  }
+
+  .faq-item__icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    transition: transform var(--transition-fast);
+  }
+
+  .faq-item.is-open .faq-item__icon {
+    transform: rotate(45deg);
+  }
+
+  .faq-item__answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .faq-item.is-open .faq-item__answer {
+    max-height: 500px;
+  }
+
+  .faq-item__answer-content {
+    padding: 0 var(--space-lg) var(--space-lg);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+  }
+
+  .faq-item__answer-content p {
+    margin: 0 0 var(--space-md);
+  }
+
+  .faq-item__answer-content p:last-child {
+    margin: 0;
+  }
+
+  .faq-contact {
+    text-align: center;
+    padding: var(--space-2xl);
+    background: var(--color-background-warm);
+    border-radius: var(--radius-lg);
+    margin-top: var(--space-3xl);
+  }
+
+  .faq-contact__title {
+    font-size: 1.25rem;
+    margin: 0 0 var(--space-sm);
+  }
+
+  .faq-contact__text {
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-lg);
+  }
+
+  .faq-contact__btn {
+    display: inline-block;
+    padding: var(--space-md) var(--space-xl);
+    background: var(--color-primary);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: background var(--transition-fast);
+  }
+
+  .faq-contact__btn:hover {
+    background: var(--color-primary-dark);
+    color: white;
+  }
+
+  @media (max-width: 600px) {
+    .faq-header__title {
+      font-size: 2rem;
+    }
+
+    .faq-categories {
+      justify-content: flex-start;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding-bottom: var(--space-sm);
+    }
+
+    .faq-category-btn {
+      flex-shrink: 0;
+    }
+  }
+</style>
+
+<div class="faq-page">
+
+  <div class="faq-header">
+    <h1 class="faq-header__title">Frequently Asked Questions</h1>
+    <p class="faq-header__subtitle">Find answers to common questions about our products and orders.</p>
+  </div>
+
+  <!-- Search -->
+  <div class="faq-search">
+    <svg class="faq-search__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"></circle>
+      <path d="M21 21l-4.35-4.35"></path>
+    </svg>
+    <input type="text" class="faq-search__input" placeholder="Search for answers..." data-faq-search>
+  </div>
+
+  <!-- Categories -->
+  <div class="faq-categories">
+    <button class="faq-category-btn is-active" data-category="all">All</button>
+    <button class="faq-category-btn" data-category="products">Products</button>
+    <button class="faq-category-btn" data-category="shipping">Shipping</button>
+    <button class="faq-category-btn" data-category="returns">Returns</button>
+    <button class="faq-category-btn" data-category="orders">Orders</button>
+  </div>
+
+  <!-- Products FAQs -->
+  <div class="faq-section" data-faq-section="products">
+    <h2 class="faq-section__title">Products</h2>
+
+    <div class="faq-item" data-faq-item>
+      <button class="faq-item__question">
+        What's the difference between PTFE sheets and release paper?
+        <svg class="faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+      <div class="faq-item__answer">
+        <div class="faq-item__answer-content">
+          <p><strong>PTFE sheets</strong> are reusable, heat-resistant cover sheets used to protect your heat press platen from vinyl residue. They're made from PTFE-coated fiberglass and can withstand temperatures up to 500°F.</p>
+          <p><strong>Release paper</strong> (silicone-coated paper) is used for storing stickers, backing transfers, and protecting diamond painting canvases. It has a silicone coating that allows adhesives to peel off cleanly.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-faq-item>
+      <button class="faq-item__question">
+        How many times can I reuse a PTFE cover sheet?
+        <svg class="faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+      <div class="faq-item__answer">
+        <div class="faq-item__answer-content">
+          <p>With proper care, our PTFE sheets can last for hundreds of presses. To maximize lifespan:</p>
+          <p>• Wipe clean with a damp cloth while still warm<br>
+          • Use a plastic scraper for stubborn residue<br>
+          • Store flat, never fold<br>
+          • Replace when the sheet becomes brittle or develops holes</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-faq-item>
+      <button class="faq-item__question">
+        What size release paper do I need for my sticker book?
+        <svg class="faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+      <div class="faq-item__answer">
+        <div class="faq-item__answer-content">
+          <p>Our 8.5x11 (letter size) release paper is the most popular for sticker books because it fits standard 3-ring binders. If you're just starting out, try our 25-pack. Growing collections do well with our 50 or 100 packs.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-faq-item>
+      <button class="faq-item__question">
+        Are the 4x4 squares really the right size for diamond painting?
+        <svg class="faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+      <div class="faq-item__answer">
+        <div class="faq-item__answer-content">
+          <p>Yes! 4x4 inches is the standard size used by diamond painters. Our squares are precision-cut with a slight overlap margin so they cover sections without gaps. They're double-sided silicone coated, so adhesive won't stick.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shipping FAQs -->
+  <div class="faq-section" data-faq-section="shipping">
+    <h2 class="faq-section__title">Shipping</h2>
+
+    <div class="faq-item" data-faq-item>
+      <button class="faq-item__question">
+        How long does shipping take?
+        <svg class="faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+      <div class="faq-item__answer">
+        <div class="faq-item__answer-content">
+          <p>We ship from Washington state. Most orders ship the same business day if placed before 2pm PST.</p>
+          <p>• <strong>Standard shipping:</strong> 3-7 business days<br>
+          • <strong>Priority shipping:</strong> 2-3 business days<br>
+          • <strong>Express shipping:</strong> 1-2 business days</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-faq-item>
+      <button class="faq-item__question">
+        Do you offer free shipping?
+        <svg class="faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+      <div class="faq-item__answer">
+        <div class="faq-item__answer-content">
+          <p>Yes! We offer free standard shipping on all orders over $35 within the continental United States.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-faq-item>
+      <button class="faq-item__question">
+        Do you ship internationally?
+        <svg class="faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+      <div class="faq-item__answer">
+        <div class="faq-item__answer-content">
+          <p>Currently, we only ship within the United States. We're working on expanding to Canada and other countries—sign up for our newsletter to be notified!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Returns FAQs -->
+  <div class="faq-section" data-faq-section="returns">
+    <h2 class="faq-section__title">Returns & Exchanges</h2>
+
+    <div class="faq-item" data-faq-item>
+      <button class="faq-item__question">
+        What's your return policy?
+        <svg class="faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+      <div class="faq-item__answer">
+        <div class="faq-item__answer-content">
+          <p>We accept returns within 30 days of delivery for unused, unopened items. If your product arrived damaged or defective, we'll replace it free of charge—just email us with a photo.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-faq-item>
+      <button class="faq-item__question">
+        How do I start a return?
+        <svg class="faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+      <div class="faq-item__answer">
+        <div class="faq-item__answer-content">
+          <p>Email us at hello@kraftandkitchen.com with your order number and reason for return. We'll send you a prepaid return label within 24 hours.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders FAQs -->
+  <div class="faq-section" data-faq-section="orders">
+    <h2 class="faq-section__title">Orders</h2>
+
+    <div class="faq-item" data-faq-item>
+      <button class="faq-item__question">
+        How do I track my order?
+        <svg class="faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+      <div class="faq-item__answer">
+        <div class="faq-item__answer-content">
+          <p>Once your order ships, you'll receive an email with a tracking number. You can also log into your account to view order status and tracking information.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" data-faq-item>
+      <button class="faq-item__question">
+        Can I modify or cancel my order?
+        <svg class="faq-item__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+      <div class="faq-item__answer">
+        <div class="faq-item__answer-content">
+          <p>We process orders quickly! If you need to make changes, email us immediately at hello@kraftandkitchen.com. We can usually accommodate changes if the order hasn't shipped yet.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact CTA -->
+  <div class="faq-contact">
+    <h3 class="faq-contact__title">Still Have Questions?</h3>
+    <p class="faq-contact__text">Our team is here to help. We typically respond within 24 hours.</p>
+    <a href="/pages/contact" class="faq-contact__btn">Contact Us</a>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  // Toggle FAQ items
+  document.querySelectorAll('[data-faq-item]').forEach(item => {
+    const btn = item.querySelector('.faq-item__question');
+    btn.addEventListener('click', () => {
+      const isOpen = item.classList.contains('is-open');
+      // Close all others
+      document.querySelectorAll('[data-faq-item]').forEach(i => i.classList.remove('is-open'));
+      // Toggle current
+      if (!isOpen) item.classList.add('is-open');
+    });
+  });
+
+  // Category filtering
+  document.querySelectorAll('[data-category]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const category = btn.dataset.category;
+
+      // Update active state
+      document.querySelectorAll('[data-category]').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+
+      // Filter sections
+      document.querySelectorAll('[data-faq-section]').forEach(section => {
+        if (category === 'all' || section.dataset.faqSection === category) {
+          section.style.display = 'block';
+        } else {
+          section.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // Search
+  const searchInput = document.querySelector('[data-faq-search]');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll('[data-faq-item]').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(query) ? 'block' : 'none';
+      });
+    });
+  }
+})();
+</script>
+
+{{ page.content }}

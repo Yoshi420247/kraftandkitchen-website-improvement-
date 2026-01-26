@@ -1,0 +1,34 @@
+{
+  "current": {
+    "colors_primary": "#1A7F7F",
+    "colors_primary_dark": "#156666",
+    "colors_accent": "#F59E0B",
+    "colors_text": "#2D2D2D",
+    "colors_text_muted": "#6B6B6B",
+    "colors_background": "#FFFFFF",
+    "colors_background_warm": "#FAF8F5",
+    "colors_border": "#E5E5E5",
+    "typography_heading_font": "Fraunces",
+    "typography_body_font": "Inter",
+    "typography_base_size": 16,
+    "free_shipping_threshold": 35,
+    "social_instagram_link": "",
+    "social_facebook_link": "",
+    "social_pinterest_link": "",
+    "social_tiktok_link": "",
+    "social_youtube_link": "",
+    "checkout_logo_width": 150,
+    "cart_type": "drawer",
+    "product_badges_enabled": true,
+    "product_badge_sale_text": "Sale",
+    "product_badge_bestseller_text": "Best Seller",
+    "product_badge_new_text": "New",
+    "reviews_enabled": true,
+    "size_finder_enabled": true
+  },
+  "presets": {
+    "Default": {
+      "colors_primary": "#1A7F7F"
+    }
+  }
+}

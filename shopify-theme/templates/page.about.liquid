@@ -1,0 +1,283 @@
+{% comment %}
+  Kraft & Kitchen - About Us Page Template
+  Assign to a page with handle "about" or "about-us"
+{% endcomment %}
+
+<style>
+  .about-page {
+    padding: var(--space-2xl) 0;
+  }
+
+  .about-hero {
+    text-align: center;
+    padding: var(--space-3xl) var(--space-lg);
+    background: var(--color-background-warm);
+    margin-bottom: var(--space-3xl);
+  }
+
+  .about-hero__title {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    margin: 0 0 var(--space-md);
+    color: var(--color-text);
+  }
+
+  .about-hero__subtitle {
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .about-section {
+    max-width: var(--container-max);
+    margin: 0 auto var(--space-3xl);
+    padding: 0 var(--space-lg);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3xl);
+    align-items: center;
+  }
+
+  .about-grid--reverse {
+    direction: rtl;
+  }
+
+  .about-grid--reverse > * {
+    direction: ltr;
+  }
+
+  .about-image {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    aspect-ratio: 4/3;
+    background: var(--color-background-warm);
+  }
+
+  .about-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .about-content h2 {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    margin: 0 0 var(--space-lg);
+    color: var(--color-text);
+  }
+
+  .about-content p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-md);
+  }
+
+  .about-values {
+    background: var(--color-background-warm);
+    padding: var(--space-3xl) var(--space-lg);
+    margin: var(--space-3xl) 0;
+  }
+
+  .about-values__container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+  }
+
+  .about-values__title {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    margin: 0 0 var(--space-2xl);
+  }
+
+  .about-values__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .about-value {
+    text-align: center;
+    padding: var(--space-xl);
+    background: var(--color-background);
+    border-radius: var(--radius-lg);
+  }
+
+  .about-value__icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+  }
+
+  .about-value__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 var(--space-sm);
+  }
+
+  .about-value__text {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .about-team {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-lg);
+    text-align: center;
+  }
+
+  .about-team__title {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    margin: 0 0 var(--space-lg);
+  }
+
+  .about-team__text {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    max-width: 700px;
+    margin: 0 auto var(--space-2xl);
+    line-height: 1.7;
+  }
+
+  .about-cta {
+    text-align: center;
+    padding: var(--space-3xl) var(--space-lg);
+    background: var(--color-primary);
+    color: white;
+  }
+
+  .about-cta__title {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    margin: 0 0 var(--space-md);
+    color: white;
+  }
+
+  .about-cta__text {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0 0 var(--space-xl);
+  }
+
+  .about-cta__btn {
+    display: inline-block;
+    padding: var(--space-md) var(--space-2xl);
+    background: white;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .about-cta__btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    color: var(--color-primary);
+  }
+
+  @media (max-width: 768px) {
+    .about-hero__title {
+      font-size: 2rem;
+    }
+
+    .about-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-xl);
+    }
+
+    .about-grid--reverse {
+      direction: ltr;
+    }
+
+    .about-values__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="about-page">
+
+  <!-- Hero -->
+  <div class="about-hero">
+    <h1 class="about-hero__title">About Kraft & Kitchen</h1>
+    <p class="about-hero__subtitle">We're crafters too. That's why we obsess over the details that make your projects easier.</p>
+  </div>
+
+  <!-- Our Story -->
+  <div class="about-section">
+    <div class="about-grid">
+      <div class="about-image">
+        <img src="{{ 'about-workspace.jpg' | asset_url }}" alt="Our craft workspace" loading="lazy">
+      </div>
+      <div class="about-content">
+        <h2>Started in a Garage, Now We're Here</h2>
+        <p>Kraft & Kitchen began when we couldn't find quality PTFE sheets that didn't cost a fortune. So we sourced our own—and discovered other crafters had the same problem.</p>
+        <p>Today, we ship thousands of orders every month from our warehouse in Washington state. But we're still the same small team obsessing over product quality and customer happiness.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mission -->
+  <div class="about-section">
+    <div class="about-grid about-grid--reverse">
+      <div class="about-image">
+        <img src="{{ 'about-products.jpg' | asset_url }}" alt="Our products" loading="lazy">
+      </div>
+      <div class="about-content">
+        <h2>Quality You Can Trust</h2>
+        <p>We test every batch of material before it becomes a product. Our PTFE sheets are rated to 500°F. Our release paper has double-sided silicone coating. Our diamond painting squares are cut to precise 4x4 dimensions.</p>
+        <p>No shortcuts. No compromises. Just supplies that work the way they should.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Values -->
+  <div class="about-values">
+    <div class="about-values__container">
+      <h2 class="about-values__title">What We Stand For</h2>
+      <div class="about-values__grid">
+        <div class="about-value">
+          <div class="about-value__icon">🎯</div>
+          <h3 class="about-value__title">Quality First</h3>
+          <p class="about-value__text">We'd rather sell fewer products that work perfectly than lots of products that disappoint.</p>
+        </div>
+        <div class="about-value">
+          <div class="about-value__icon">💬</div>
+          <h3 class="about-value__title">Real Support</h3>
+          <p class="about-value__text">Email us with a question and you'll get a real answer from someone who actually crafts.</p>
+        </div>
+        <div class="about-value">
+          <div class="about-value__icon">🚚</div>
+          <h3 class="about-value__title">Fast & Fair</h3>
+          <p class="about-value__text">Free shipping over $35. Most orders ship same day. Simple returns if something's not right.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team -->
+  <div class="about-team">
+    <h2 class="about-team__title">Small Team, Big Passion</h2>
+    <p class="about-team__text">We're a small team of crafters, makers, and problem-solvers based in the Pacific Northwest. When we're not packing orders, you'll find us heat pressing, diamond painting, making stickers, and testing new products.</p>
+  </div>
+
+  <!-- CTA -->
+  <div class="about-cta">
+    <h2 class="about-cta__title">Ready to Create?</h2>
+    <p class="about-cta__text">Browse our collection of premium craft supplies.</p>
+    <a href="/collections/all" class="about-cta__btn">Shop All Products</a>
+  </div>
+
+</div>
+
+{{ page.content }}

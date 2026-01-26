@@ -1,0 +1,431 @@
+{% comment %}
+  Kraft & Kitchen - Testimonials Section
+  Customer reviews carousel/grid
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "tag": "section",
+  "class": "testimonials-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "What Crafters Are Saying"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Real reviews from real makers"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "grid", "label": "Grid" },
+        { "value": "carousel", "label": "Carousel" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#FAF8F5"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Star rating",
+          "min": 1,
+          "max": 5,
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "These PTFE sheets are exactly what I needed for my heat press business. No more sticky residue!"
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author name",
+          "default": "Sarah M."
+        },
+        {
+          "type": "text",
+          "id": "location",
+          "label": "Location",
+          "default": "Texas"
+        },
+        {
+          "type": "text",
+          "id": "product",
+          "label": "Product purchased",
+          "default": "PTFE Cover Sheet 16x20"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Verified purchase",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [
+        {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "These PTFE sheets are exactly what I needed for my heat press business. No more sticky residue!",
+            "author": "Sarah M.",
+            "location": "Texas",
+            "product": "PTFE Cover Sheet 16x20",
+            "verified": true
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "Finally found release paper that actually works for my sticker book. Stickers peel off perfectly every time.",
+            "author": "Emily K.",
+            "location": "California",
+            "product": "Release Paper 8.5x11 - 50 Pack",
+            "verified": true
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "The 4x4 squares are perfect for diamond painting. I can work section by section without worrying about dust.",
+            "author": "Jessica T.",
+            "location": "Florida",
+            "product": "Diamond Painting Squares - 200 Pack",
+            "verified": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .testimonials {
+    background: {{ section.settings.background_color }};
+    padding: var(--space-3xl) var(--space-lg);
+  }
+
+  .testimonials__container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+  }
+
+  .testimonials__header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .testimonials__heading {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    color: var(--color-text);
+    margin: 0 0 var(--space-sm);
+  }
+
+  .testimonials__subheading {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .testimonials__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .testimonial-card {
+    background: var(--color-background);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-base), transform var(--transition-base);
+  }
+
+  .testimonial-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .testimonial-card__stars {
+    color: #F59E0B;
+    font-size: 1.25rem;
+    margin-bottom: var(--space-md);
+    letter-spacing: 2px;
+  }
+
+  .testimonial-card__quote {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    margin: 0 0 var(--space-lg);
+    font-style: italic;
+  }
+
+  .testimonial-card__quote::before {
+    content: '"';
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .testimonial-card__quote::after {
+    content: '"';
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .testimonial-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .testimonial-card__author {
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .testimonial-card__location {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .testimonial-card__verified {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--color-success);
+    font-weight: 500;
+  }
+
+  .testimonial-card__verified svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .testimonial-card__product {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: var(--space-sm);
+  }
+
+  /* Carousel Layout */
+  .testimonials__carousel {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .testimonials__carousel-track {
+    display: flex;
+    gap: var(--space-lg);
+    transition: transform 0.5s ease;
+  }
+
+  .testimonials__carousel .testimonial-card {
+    flex: 0 0 calc(33.333% - var(--space-lg));
+    min-width: 300px;
+  }
+
+  .testimonials__nav {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+  }
+
+  .testimonials__nav-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-border);
+    background: var(--color-background);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+  }
+
+  .testimonials__nav-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .testimonials__nav-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  @media (max-width: 991px) {
+    .testimonials__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .testimonials__carousel .testimonial-card {
+      flex: 0 0 calc(50% - var(--space-lg));
+    }
+  }
+
+  @media (max-width: 600px) {
+    .testimonials {
+      padding: var(--space-2xl) var(--space-md);
+    }
+
+    .testimonials__heading {
+      font-size: 1.5rem;
+    }
+
+    .testimonials__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .testimonials__carousel .testimonial-card {
+      flex: 0 0 100%;
+    }
+  }
+</style>
+
+{% if section.blocks.size > 0 %}
+<div class="testimonials">
+  <div class="testimonials__container">
+
+    {% if section.settings.heading != blank or section.settings.subheading != blank %}
+      <div class="testimonials__header">
+        {% if section.settings.heading != blank %}
+          <h2 class="testimonials__heading">{{ section.settings.heading }}</h2>
+        {% endif %}
+        {% if section.settings.subheading != blank %}
+          <p class="testimonials__subheading">{{ section.settings.subheading }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if section.settings.layout == 'carousel' %}
+      <div class="testimonials__carousel">
+        <div class="testimonials__carousel-track" data-testimonials-track>
+    {% else %}
+      <div class="testimonials__grid">
+    {% endif %}
+
+        {% for block in section.blocks %}
+          {% if block.type == 'testimonial' %}
+            <div class="testimonial-card" {{ block.shopify_attributes }}>
+              <div class="testimonial-card__stars">
+                {% for i in (1..block.settings.rating) %}★{% endfor %}{% for i in (block.settings.rating..4) %}☆{% endfor %}
+              </div>
+
+              <p class="testimonial-card__quote">{{ block.settings.quote }}</p>
+
+              <div class="testimonial-card__footer">
+                <div>
+                  <p class="testimonial-card__author">{{ block.settings.author }}</p>
+                  {% if block.settings.location != blank %}
+                    <p class="testimonial-card__location">{{ block.settings.location }}</p>
+                  {% endif %}
+                </div>
+
+                {% if block.settings.verified %}
+                  <span class="testimonial-card__verified">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                    Verified
+                  </span>
+                {% endif %}
+              </div>
+
+              {% if block.settings.product != blank %}
+                <p class="testimonial-card__product">Purchased: {{ block.settings.product }}</p>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+    {% if section.settings.layout == 'carousel' %}
+        </div>
+        <div class="testimonials__nav">
+          <button class="testimonials__nav-btn" data-testimonials-prev aria-label="Previous">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
+          <button class="testimonials__nav-btn" data-testimonials-next aria-label="Next">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    {% else %}
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endif %}
+
+{% if section.settings.layout == 'carousel' %}
+<script>
+  (function() {
+    const track = document.querySelector('[data-testimonials-track]');
+    const prevBtn = document.querySelector('[data-testimonials-prev]');
+    const nextBtn = document.querySelector('[data-testimonials-next]');
+
+    if (!track || !prevBtn || !nextBtn) return;
+
+    let position = 0;
+    const cards = track.children;
+    const cardWidth = cards[0].offsetWidth + 24; // card + gap
+    const maxPosition = -(cards.length - 3) * cardWidth;
+
+    function updatePosition() {
+      track.style.transform = `translateX(${position}px)`;
+    }
+
+    prevBtn.addEventListener('click', () => {
+      position = Math.min(position + cardWidth, 0);
+      updatePosition();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      position = Math.max(position - cardWidth, maxPosition);
+      updatePosition();
+    });
+  })();
+</script>
+{% endif %}
