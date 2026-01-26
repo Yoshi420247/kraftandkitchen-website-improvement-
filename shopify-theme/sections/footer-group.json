@@ -1,0 +1,40 @@
+{
+  "type": "footer-group",
+  "name": "Footer group",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "about_text": "Premium craft supplies for makers who demand quality. Based in Washington state, shipping nationwide.",
+        "newsletter_heading": "Get 10% Off Your First Order",
+        "newsletter_subtext": "Plus craft tips, new products, and exclusive deals."
+      },
+      "blocks": {
+        "links-shop": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Shop",
+            "menu": "footer-shop"
+          }
+        },
+        "links-help": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Help",
+            "menu": "footer-help"
+          }
+        },
+        "contact": {
+          "type": "contact",
+          "settings": {
+            "heading": "Contact Us",
+            "email": "hello@kraftandkitchen.com",
+            "hours": "Mon-Fri 9am-5pm PST"
+          }
+        }
+      },
+      "block_order": ["links-shop", "links-help", "contact"]
+    }
+  },
+  "order": ["footer"]
+}

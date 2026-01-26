@@ -1,0 +1,33 @@
+{
+  "type": "header-group",
+  "name": "Header group",
+  "sections": {
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_width": 120,
+        "menu": "main-menu",
+        "show_announcement": true,
+        "announcement_text": "Free shipping on orders over $35!",
+        "sticky_header": true
+      },
+      "blocks": {
+        "mega-menu-shop": {
+          "type": "mega_menu",
+          "settings": {
+            "menu_title": "Shop",
+            "column_1_title": "By Project",
+            "column_1_links": "shop-by-project",
+            "column_2_title": "By Product",
+            "column_2_links": "shop-by-product",
+            "column_3_title": "Resources",
+            "column_3_links": "resources",
+            "featured_badge": "Best Seller"
+          }
+        }
+      },
+      "block_order": ["mega-menu-shop"]
+    }
+  },
+  "order": ["header"]
+}

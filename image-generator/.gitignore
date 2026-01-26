@@ -1,0 +1,26 @@
+# Environment variables - NEVER COMMIT
+.env
+.env.local
+.env.production
+
+# Generated images (large files)
+generated_images/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

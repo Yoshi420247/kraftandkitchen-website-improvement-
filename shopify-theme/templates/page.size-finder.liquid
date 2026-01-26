@@ -1,0 +1,792 @@
+{% comment %}
+  Kraft & Kitchen - Size Finder Page Template
+  File: templates/page.size-finder.liquid
+
+  Interactive quiz to help customers find the right product and size.
+  Assign this template to a page with handle "size-finder"
+{% endcomment %}
+
+<style>
+  .size-finder {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 48px 24px;
+  }
+
+  .size-finder__header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .size-finder__title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 2.5rem;
+    color: #2D2D2D;
+    margin: 0 0 12px;
+  }
+
+  .size-finder__subtitle {
+    font-size: 1.1rem;
+    color: #6B6B6B;
+    margin: 0;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* Progress Bar */
+  .size-finder__progress {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 40px;
+  }
+
+  .size-finder__progress-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .size-finder__progress-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #E5E5E5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6B6B6B;
+    transition: all 0.2s ease;
+  }
+
+  .size-finder__progress-step.is-active .size-finder__progress-dot {
+    background: #1A7F7F;
+    color: white;
+  }
+
+  .size-finder__progress-step.is-complete .size-finder__progress-dot {
+    background: #1A7F7F;
+    color: white;
+  }
+
+  .size-finder__progress-step.is-complete .size-finder__progress-dot::after {
+    content: '✓';
+  }
+
+  .size-finder__progress-label {
+    font-size: 0.85rem;
+    color: #6B6B6B;
+    display: none;
+  }
+
+  .size-finder__progress-line {
+    width: 40px;
+    height: 2px;
+    background: #E5E5E5;
+  }
+
+  .size-finder__progress-step.is-complete + .size-finder__progress-line {
+    background: #1A7F7F;
+  }
+
+  @media (min-width: 600px) {
+    .size-finder__progress-label {
+      display: block;
+    }
+  }
+
+  /* Steps */
+  .size-finder__step {
+    display: none;
+  }
+
+  .size-finder__step.is-active {
+    display: block;
+  }
+
+  .size-finder__step-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.5rem;
+    color: #2D2D2D;
+    text-align: center;
+    margin: 0 0 32px;
+  }
+
+  /* Option Buttons */
+  .size-finder__options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .size-finder__option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 16px;
+    background: white;
+    border: 2px solid #E5E5E5;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+
+  .size-finder__option:hover {
+    border-color: #1A7F7F;
+  }
+
+  .size-finder__option.is-selected {
+    border-color: #1A7F7F;
+    background: #E6F3F3;
+  }
+
+  .size-finder__option-icon {
+    font-size: 2.5rem;
+  }
+
+  .size-finder__option-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2D2D2D;
+  }
+
+  .size-finder__option-desc {
+    font-size: 0.85rem;
+    color: #6B6B6B;
+    margin-top: -8px;
+  }
+
+  /* Navigation */
+  .size-finder__nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .size-finder__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .size-finder__btn--back {
+    background: transparent;
+    border: 2px solid #E5E5E5;
+    color: #6B6B6B;
+  }
+
+  .size-finder__btn--back:hover {
+    border-color: #2D2D2D;
+    color: #2D2D2D;
+  }
+
+  .size-finder__btn--next {
+    background: #1A7F7F;
+    border: 2px solid #1A7F7F;
+    color: white;
+    margin-left: auto;
+  }
+
+  .size-finder__btn--next:hover {
+    background: #156666;
+    border-color: #156666;
+  }
+
+  .size-finder__btn--next:disabled {
+    background: #9A9A9A;
+    border-color: #9A9A9A;
+    cursor: not-allowed;
+  }
+
+  /* Results */
+  .size-finder__results {
+    display: none;
+  }
+
+  .size-finder__results.is-active {
+    display: block;
+  }
+
+  .size-finder__result-card {
+    background: white;
+    border: 2px solid #E5E5E5;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 24px;
+  }
+
+  .size-finder__result-image {
+    width: 160px;
+    height: 160px;
+    background: #FAF8F5;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .size-finder__result-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .size-finder__result-content {
+    flex: 1;
+  }
+
+  .size-finder__result-badge {
+    display: inline-block;
+    background: #1A7F7F;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .size-finder__result-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.25rem;
+    color: #2D2D2D;
+    margin: 0 0 8px;
+  }
+
+  .size-finder__result-why {
+    font-size: 0.95rem;
+    color: #6B6B6B;
+    margin: 0 0 16px;
+    line-height: 1.5;
+  }
+
+  .size-finder__result-price {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2D2D2D;
+    margin-bottom: 16px;
+  }
+
+  .size-finder__result-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background: #1A7F7F;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+  }
+
+  .size-finder__result-cta:hover {
+    background: #156666;
+  }
+
+  .size-finder__start-over {
+    display: block;
+    text-align: center;
+    margin-top: 32px;
+    font-size: 0.95rem;
+    color: #1A7F7F;
+    text-decoration: none;
+  }
+
+  .size-finder__start-over:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 600px) {
+    .size-finder__title {
+      font-size: 1.75rem;
+    }
+
+    .size-finder__options {
+      grid-template-columns: 1fr;
+    }
+
+    .size-finder__result-card {
+      flex-direction: column;
+    }
+
+    .size-finder__result-image {
+      width: 100%;
+      height: 200px;
+    }
+  }
+</style>
+
+<div class="size-finder" id="size-finder">
+
+  <div class="size-finder__header">
+    <h1 class="size-finder__title">Find Your Perfect Size</h1>
+    <p class="size-finder__subtitle">Answer a few quick questions and we'll recommend the right product and pack size for your project.</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="size-finder__progress">
+    <div class="size-finder__progress-step is-active" data-step="1">
+      <span class="size-finder__progress-dot">1</span>
+      <span class="size-finder__progress-label">Project</span>
+    </div>
+    <div class="size-finder__progress-line"></div>
+    <div class="size-finder__progress-step" data-step="2">
+      <span class="size-finder__progress-dot">2</span>
+      <span class="size-finder__progress-label">Details</span>
+    </div>
+    <div class="size-finder__progress-line"></div>
+    <div class="size-finder__progress-step" data-step="3">
+      <span class="size-finder__progress-dot">3</span>
+      <span class="size-finder__progress-label">Result</span>
+    </div>
+  </div>
+
+  <!-- Step 1: Project Type -->
+  <div class="size-finder__step is-active" data-step="1">
+    <h2 class="size-finder__step-title">What are you making?</h2>
+
+    <div class="size-finder__options">
+      <button type="button" class="size-finder__option" data-value="stickers">
+        <span class="size-finder__option-icon">📒</span>
+        <span class="size-finder__option-text">Sticker Book Pages</span>
+        <span class="size-finder__option-desc">Storing and organizing stickers</span>
+      </button>
+
+      <button type="button" class="size-finder__option" data-value="transfers">
+        <span class="size-finder__option-icon">🔄</span>
+        <span class="size-finder__option-text">Transfers (UV DTF, HTV)</span>
+        <span class="size-finder__option-desc">Transfer paper backing</span>
+      </button>
+
+      <button type="button" class="size-finder__option" data-value="heat-press">
+        <span class="size-finder__option-icon">🔥</span>
+        <span class="size-finder__option-text">Heat Press Protection</span>
+        <span class="size-finder__option-desc">Cover sheets for pressing</span>
+      </button>
+
+      <button type="button" class="size-finder__option" data-value="diamond-painting">
+        <span class="size-finder__option-icon">💎</span>
+        <span class="size-finder__option-text">Diamond Painting</span>
+        <span class="size-finder__option-desc">Protecting adhesive canvas</span>
+      </button>
+
+      <button type="button" class="size-finder__option" data-value="resin">
+        <span class="size-finder__option-icon">🧪</span>
+        <span class="size-finder__option-text">Resin / Glue Cleanup</span>
+        <span class="size-finder__option-desc">Work surface protection</span>
+      </button>
+    </div>
+
+    <div class="size-finder__nav">
+      <span></span>
+      <button type="button" class="size-finder__btn size-finder__btn--next" disabled>
+        Next <span aria-hidden="true">→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 2: Context Questions (Dynamic) -->
+  <div class="size-finder__step" data-step="2">
+    <h2 class="size-finder__step-title" id="step2-title">Tell us more</h2>
+
+    <!-- Sticker Options -->
+    <div class="size-finder__options size-finder__context-options" data-context="stickers" style="display: none;">
+      <button type="button" class="size-finder__option" data-value="starter">
+        <span class="size-finder__option-text">Just starting</span>
+        <span class="size-finder__option-desc">Less than 100 stickers</span>
+      </button>
+      <button type="button" class="size-finder__option" data-value="growing">
+        <span class="size-finder__option-text">Growing collection</span>
+        <span class="size-finder__option-desc">100-500 stickers</span>
+      </button>
+      <button type="button" class="size-finder__option" data-value="serious">
+        <span class="size-finder__option-text">Serious collector</span>
+        <span class="size-finder__option-desc">500+ stickers</span>
+      </button>
+    </div>
+
+    <!-- Heat Press Options -->
+    <div class="size-finder__options size-finder__context-options" data-context="heat-press" style="display: none;">
+      <button type="button" class="size-finder__option" data-value="9x12">
+        <span class="size-finder__option-text">9x12 or smaller</span>
+        <span class="size-finder__option-desc">Craft or mini press</span>
+      </button>
+      <button type="button" class="size-finder__option" data-value="15x15">
+        <span class="size-finder__option-text">15x15</span>
+        <span class="size-finder__option-desc">Standard home press</span>
+      </button>
+      <button type="button" class="size-finder__option" data-value="16x20">
+        <span class="size-finder__option-text">16x20</span>
+        <span class="size-finder__option-desc">Full-size press</span>
+      </button>
+      <button type="button" class="size-finder__option" data-value="18x20">
+        <span class="size-finder__option-text">18x20 or larger</span>
+        <span class="size-finder__option-desc">Commercial press</span>
+      </button>
+    </div>
+
+    <!-- Diamond Painting Options -->
+    <div class="size-finder__options size-finder__context-options" data-context="diamond-painting" style="display: none;">
+      <button type="button" class="size-finder__option" data-value="single">
+        <span class="size-finder__option-text">1 at a time</span>
+        <span class="size-finder__option-desc">Working one project</span>
+      </button>
+      <button type="button" class="size-finder__option" data-value="multiple">
+        <span class="size-finder__option-text">2-3 active projects</span>
+        <span class="size-finder__option-desc">Rotating between canvases</span>
+      </button>
+      <button type="button" class="size-finder__option" data-value="many">
+        <span class="size-finder__option-text">Many projects / gifting</span>
+        <span class="size-finder__option-desc">High volume use</span>
+      </button>
+    </div>
+
+    <!-- Transfers Options -->
+    <div class="size-finder__options size-finder__context-options" data-context="transfers" style="display: none;">
+      <button type="button" class="size-finder__option" data-value="letter">
+        <span class="size-finder__option-text">Letter size (8.5x11)</span>
+        <span class="size-finder__option-desc">Standard printer size</span>
+      </button>
+      <button type="button" class="size-finder__option" data-value="legal">
+        <span class="size-finder__option-text">Legal size or larger</span>
+        <span class="size-finder__option-desc">Extended length transfers</span>
+      </button>
+    </div>
+
+    <!-- Resin Options -->
+    <div class="size-finder__options size-finder__context-options" data-context="resin" style="display: none;">
+      <button type="button" class="size-finder__option" data-value="small">
+        <span class="size-finder__option-text">Small workspace</span>
+        <span class="size-finder__option-desc">Desk area</span>
+      </button>
+      <button type="button" class="size-finder__option" data-value="medium">
+        <span class="size-finder__option-text">Medium workspace</span>
+        <span class="size-finder__option-desc">Craft table section</span>
+      </button>
+      <button type="button" class="size-finder__option" data-value="large">
+        <span class="size-finder__option-text">Large workspace</span>
+        <span class="size-finder__option-desc">Full table coverage</span>
+      </button>
+    </div>
+
+    <div class="size-finder__nav">
+      <button type="button" class="size-finder__btn size-finder__btn--back">
+        <span aria-hidden="true">←</span> Back
+      </button>
+      <button type="button" class="size-finder__btn size-finder__btn--next" disabled>
+        See Recommendation <span aria-hidden="true">→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="size-finder__results" data-step="3">
+    <h2 class="size-finder__step-title">Your Recommendation</h2>
+
+    <div class="size-finder__result-card" id="recommendation">
+      <div class="size-finder__result-image">
+        <img src="" alt="" id="result-image">
+      </div>
+      <div class="size-finder__result-content">
+        <span class="size-finder__result-badge">Recommended</span>
+        <h3 class="size-finder__result-title" id="result-title">Product Name</h3>
+        <p class="size-finder__result-why" id="result-why">Why this product is right for you.</p>
+        <p class="size-finder__result-price" id="result-price">$0.00</p>
+        <a href="#" class="size-finder__result-cta" id="result-cta">View Product</a>
+      </div>
+    </div>
+
+    <a href="#" class="size-finder__start-over" id="start-over">Start Over</a>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  const finder = document.getElementById('size-finder');
+  if (!finder) return;
+
+  // Recommendation data
+  const recommendations = {
+    'stickers-starter': {
+      title: 'Silicone Release Paper 8.5x11 - 25 Pack',
+      handle: 'silicone-release-paper-letter-25',
+      image: '{{ "release-paper-letter.jpg" | asset_url }}',
+      price: '$9.99',
+      why: 'Letter size fits standard binders. Double-sided coating means stickers peel clean from both sides. 25 sheets is perfect for starting your collection.'
+    },
+    'stickers-growing': {
+      title: 'Silicone Release Paper 8.5x11 - 50 Pack',
+      handle: 'silicone-release-paper-letter-50',
+      image: '{{ "release-paper-letter.jpg" | asset_url }}',
+      price: '$14.99',
+      why: 'Letter size fits standard binders. 50 sheets gives you room to grow your sticker collection without running out.'
+    },
+    'stickers-serious': {
+      title: 'Silicone Release Paper 8.5x11 - 100 Pack',
+      handle: 'silicone-release-paper-letter-100',
+      image: '{{ "release-paper-letter.jpg" | asset_url }}',
+      price: '$24.99',
+      why: 'Best value for serious collectors. 100 sheets keeps your entire collection organized with room to spare.'
+    },
+    'heat-press-9x12': {
+      title: 'PTFE Cover Sheet 12x15',
+      handle: 'ptfe-cover-sheet-12x15',
+      image: '{{ "ptfe-cover-sheet.jpg" | asset_url }}',
+      price: '$7.99',
+      why: 'Perfectly sized for craft and mini heat presses. Protects your platen from residue and provides consistent results.'
+    },
+    'heat-press-15x15': {
+      title: 'PTFE Cover Sheet 16x20 - 2 Pack',
+      handle: 'ptfe-cover-sheet-16x20-2pack',
+      image: '{{ "ptfe-cover-sheet.jpg" | asset_url }}',
+      price: '$12.99',
+      why: 'Sized to cover your 15x15 press with overlap. 2-pack lets you rotate while one cools for faster production.'
+    },
+    'heat-press-16x20': {
+      title: 'PTFE Cover Sheet 16x20 - 5 Pack',
+      handle: 'ptfe-cover-sheet-16x20-5pack',
+      image: '{{ "ptfe-cover-sheet.jpg" | asset_url }}',
+      price: '$24.99',
+      why: 'Perfect fit for your press. 5-pack is ideal for regular use—replace sheets as they wear without running out.'
+    },
+    'heat-press-18x20': {
+      title: 'PTFE Cover Sheet 18x20',
+      handle: 'ptfe-cover-sheet-18x20',
+      image: '{{ "ptfe-cover-sheet.jpg" | asset_url }}',
+      price: '$9.99',
+      why: 'Sized for commercial presses. Full coverage protects your platen from edge-to-edge residue buildup.'
+    },
+    'diamond-painting-single': {
+      title: 'Diamond Painting Squares 4x4 - 100 Pack',
+      handle: 'diamond-painting-squares-100',
+      image: '{{ "diamond-squares.jpg" | asset_url }}',
+      price: '$12.99',
+      why: '4x4 squares are the standard size. 100 pack covers multiple sections while you work on a single project.'
+    },
+    'diamond-painting-multiple': {
+      title: 'Diamond Painting Squares 4x4 - 200 Pack',
+      handle: 'diamond-painting-squares-200',
+      image: '{{ "diamond-squares.jpg" | asset_url }}',
+      price: '$19.99',
+      why: 'Perfect for rotating between projects. 200 squares means you never run out across multiple canvases.'
+    },
+    'diamond-painting-many': {
+      title: 'Diamond Painting Squares 4x4 - 200 Pack (x2)',
+      handle: 'diamond-painting-squares-200',
+      image: '{{ "diamond-squares.jpg" | asset_url }}',
+      price: '$19.99 each',
+      why: 'For high-volume use, we recommend grabbing two packs. Always have fresh squares ready for new projects.'
+    },
+    'transfers-letter': {
+      title: 'Silicone Release Paper 8.5x11 - 100 Pack',
+      handle: 'silicone-release-paper-letter-100',
+      image: '{{ "release-paper-letter.jpg" | asset_url }}',
+      price: '$24.99',
+      why: 'Standard printer size for backing transfers. 100 sheets keeps your production running smoothly.'
+    },
+    'transfers-legal': {
+      title: 'Silicone Release Paper 8.5x14 - 100 Pack',
+      handle: 'silicone-release-paper-legal-100',
+      image: '{{ "release-paper-legal.jpg" | asset_url }}',
+      price: '$29.99',
+      why: 'Legal size accommodates longer transfers. Silicone coating provides clean release every time.'
+    },
+    'resin-small': {
+      title: 'Silicone Work Mat - Small',
+      handle: 'silicone-mat-small',
+      image: '{{ "silicone-mat.jpg" | asset_url }}',
+      price: '$14.99',
+      why: 'Fits desk workspaces. Cured resin peels right off—reusable protection for your work surface.'
+    },
+    'resin-medium': {
+      title: 'Silicone Work Mat - Medium',
+      handle: 'silicone-mat-medium',
+      image: '{{ "silicone-mat.jpg" | asset_url }}',
+      price: '$24.99',
+      why: 'Covers a craft table section. Perfect size for most resin projects with room for tools.'
+    },
+    'resin-large': {
+      title: 'Silicone Work Mat - Large',
+      handle: 'silicone-mat-large',
+      image: '{{ "silicone-mat.jpg" | asset_url }}',
+      price: '$39.99',
+      why: 'Full table coverage for large projects. Reusable, easy to clean, protects your entire workspace.'
+    }
+  };
+
+  // State
+  let currentStep = 1;
+  let projectType = null;
+  let contextAnswer = null;
+
+  // Elements
+  const steps = finder.querySelectorAll('.size-finder__step');
+  const progressSteps = finder.querySelectorAll('.size-finder__progress-step');
+  const resultsSection = finder.querySelector('.size-finder__results');
+
+  // Update progress UI
+  function updateProgress() {
+    progressSteps.forEach((step, index) => {
+      const stepNum = index + 1;
+      step.classList.remove('is-active', 'is-complete');
+
+      if (stepNum < currentStep) {
+        step.classList.add('is-complete');
+      } else if (stepNum === currentStep) {
+        step.classList.add('is-active');
+      }
+    });
+  }
+
+  // Show step
+  function showStep(stepNum) {
+    steps.forEach(step => step.classList.remove('is-active'));
+    resultsSection.classList.remove('is-active');
+
+    if (stepNum === 3) {
+      resultsSection.classList.add('is-active');
+      showResults();
+    } else {
+      const targetStep = finder.querySelector(`.size-finder__step[data-step="${stepNum}"]`);
+      if (targetStep) targetStep.classList.add('is-active');
+    }
+
+    currentStep = stepNum;
+    updateProgress();
+  }
+
+  // Show context options based on project type
+  function showContextOptions(type) {
+    const allContextOptions = finder.querySelectorAll('.size-finder__context-options');
+    allContextOptions.forEach(opt => opt.style.display = 'none');
+
+    const targetContext = finder.querySelector(`.size-finder__context-options[data-context="${type}"]`);
+    if (targetContext) {
+      targetContext.style.display = 'grid';
+    }
+
+    // Update step 2 title based on project
+    const step2Title = document.getElementById('step2-title');
+    const titles = {
+      'stickers': 'How many stickers do you have?',
+      'heat-press': 'What size is your heat press?',
+      'diamond-painting': 'How many canvases do you work on?',
+      'transfers': 'What size transfers?',
+      'resin': 'What size workspace?'
+    };
+    step2Title.textContent = titles[type] || 'Tell us more';
+  }
+
+  // Show results
+  function showResults() {
+    const key = `${projectType}-${contextAnswer}`;
+    const rec = recommendations[key];
+
+    if (rec) {
+      document.getElementById('result-title').textContent = rec.title;
+      document.getElementById('result-why').textContent = rec.why;
+      document.getElementById('result-price').textContent = rec.price;
+      document.getElementById('result-image').src = rec.image;
+      document.getElementById('result-image').alt = rec.title;
+      document.getElementById('result-cta').href = `/products/${rec.handle}`;
+    }
+
+    // Track analytics event
+    if (typeof analytics !== 'undefined') {
+      analytics.track('size_finder_result_viewed', {
+        project_type: projectType,
+        context: contextAnswer,
+        recommendation: rec ? rec.handle : null
+      });
+    }
+  }
+
+  // Handle option selection for step 1
+  const step1Options = finder.querySelectorAll('.size-finder__step[data-step="1"] .size-finder__option');
+  step1Options.forEach(option => {
+    option.addEventListener('click', () => {
+      step1Options.forEach(opt => opt.classList.remove('is-selected'));
+      option.classList.add('is-selected');
+      projectType = option.dataset.value;
+
+      const nextBtn = finder.querySelector('.size-finder__step[data-step="1"] .size-finder__btn--next');
+      nextBtn.disabled = false;
+    });
+  });
+
+  // Handle option selection for step 2
+  finder.querySelectorAll('.size-finder__context-options').forEach(contextGroup => {
+    contextGroup.querySelectorAll('.size-finder__option').forEach(option => {
+      option.addEventListener('click', () => {
+        contextGroup.querySelectorAll('.size-finder__option').forEach(opt => opt.classList.remove('is-selected'));
+        option.classList.add('is-selected');
+        contextAnswer = option.dataset.value;
+
+        const nextBtn = finder.querySelector('.size-finder__step[data-step="2"] .size-finder__btn--next');
+        nextBtn.disabled = false;
+      });
+    });
+  });
+
+  // Next buttons
+  finder.querySelectorAll('.size-finder__btn--next').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (currentStep === 1 && projectType) {
+        showContextOptions(projectType);
+        showStep(2);
+      } else if (currentStep === 2 && contextAnswer) {
+        showStep(3);
+      }
+    });
+  });
+
+  // Back buttons
+  finder.querySelectorAll('.size-finder__btn--back').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (currentStep === 2) {
+        showStep(1);
+        contextAnswer = null;
+        finder.querySelectorAll('.size-finder__step[data-step="2"] .size-finder__option').forEach(opt => {
+          opt.classList.remove('is-selected');
+        });
+        finder.querySelector('.size-finder__step[data-step="2"] .size-finder__btn--next').disabled = true;
+      }
+    });
+  });
+
+  // Start over
+  document.getElementById('start-over').addEventListener('click', (e) => {
+    e.preventDefault();
+    projectType = null;
+    contextAnswer = null;
+    step1Options.forEach(opt => opt.classList.remove('is-selected'));
+    finder.querySelectorAll('.size-finder__step[data-step="2"] .size-finder__option').forEach(opt => {
+      opt.classList.remove('is-selected');
+    });
+    finder.querySelectorAll('.size-finder__btn--next').forEach(btn => btn.disabled = true);
+    showStep(1);
+  });
+
+  // Track start
+  if (typeof analytics !== 'undefined') {
+    analytics.track('size_finder_started');
+  }
+
+})();
+</script>

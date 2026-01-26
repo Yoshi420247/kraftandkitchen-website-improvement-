@@ -1,0 +1,561 @@
+{% comment %}
+  Kraft & Kitchen - Collection Product Grid
+  File: sections/collection-product-grid.liquid
+
+  Product grid with filters and sorting for collection pages.
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Collection Product Grid",
+  "tag": "section",
+  "class": "collection-grid-section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show filters",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show sort dropdown",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "grid_columns",
+      "label": "Grid columns (desktop)",
+      "options": [
+        { "value": "3", "label": "3 columns" },
+        { "value": "4", "label": "4 columns" }
+      ],
+      "default": "4"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Product Grid"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .collection-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  .collection-grid__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #E5E5E5;
+  }
+
+  .collection-grid__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .collection-grid__filter {
+    position: relative;
+  }
+
+  .collection-grid__filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: white;
+    border: 1px solid #E5E5E5;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #2D2D2D;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .collection-grid__filter-btn:hover {
+    border-color: #1A7F7F;
+  }
+
+  .collection-grid__filter-btn.is-active {
+    border-color: #1A7F7F;
+    background: #E6F3F3;
+    color: #1A7F7F;
+  }
+
+  .collection-grid__filter-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 8px;
+    background: white;
+    border: 1px solid #E5E5E5;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    z-index: 100;
+    display: none;
+  }
+
+  .collection-grid__filter.is-open .collection-grid__filter-dropdown {
+    display: block;
+  }
+
+  .collection-grid__filter-option {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    text-align: left;
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    color: #2D2D2D;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .collection-grid__filter-option:hover {
+    background: #FAF8F5;
+  }
+
+  .collection-grid__filter-option.is-selected {
+    color: #1A7F7F;
+    font-weight: 600;
+  }
+
+  .collection-grid__sort {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .collection-grid__sort-label {
+    font-size: 0.9rem;
+    color: #6B6B6B;
+  }
+
+  .collection-grid__sort-select {
+    padding: 10px 32px 10px 12px;
+    background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%232D2D2D' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E") no-repeat right 12px center;
+    border: 1px solid #E5E5E5;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #2D2D2D;
+    cursor: pointer;
+    appearance: none;
+  }
+
+  .collection-grid__products {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.grid_columns }}, 1fr);
+    gap: 24px;
+  }
+
+  /* Product Card - Same as best sellers */
+  .product-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .product-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .product-card__image-wrapper {
+    position: relative;
+    aspect-ratio: 1;
+    background: #FAF8F5;
+    overflow: hidden;
+  }
+
+  .product-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:hover .product-card__image {
+    transform: scale(1.05);
+  }
+
+  .product-card__badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #1A7F7F;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  .product-card__badge--sale {
+    background: #DC2626;
+  }
+
+  .product-card__content {
+    padding: 16px;
+  }
+
+  .product-card__best-for {
+    font-size: 0.8rem;
+    color: #6B6B6B;
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .product-card__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2D2D2D;
+    margin: 0 0 8px;
+    line-height: 1.3;
+  }
+
+  .product-card__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .product-card__title a:hover {
+    color: #1A7F7F;
+  }
+
+  .product-card__price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2D2D2D;
+  }
+
+  .product-card__price-compare {
+    font-size: 0.9rem;
+    color: #9A9A9A;
+    text-decoration: line-through;
+    font-weight: 400;
+  }
+
+  .product-card__reviews {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 0.85rem;
+  }
+
+  .product-card__stars {
+    color: #F59E0B;
+  }
+
+  .product-card__review-count {
+    color: #6B6B6B;
+  }
+
+  /* Pagination */
+  .collection-grid__pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 48px;
+  }
+
+  .collection-grid__pagination a,
+  .collection-grid__pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #E5E5E5;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #2D2D2D;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .collection-grid__pagination a:hover {
+    border-color: #1A7F7F;
+    color: #1A7F7F;
+  }
+
+  .collection-grid__pagination span.is-current {
+    background: #1A7F7F;
+    border-color: #1A7F7F;
+    color: white;
+  }
+
+  /* No products */
+  .collection-grid__empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 48px 24px;
+  }
+
+  .collection-grid__empty-title {
+    font-size: 1.25rem;
+    color: #2D2D2D;
+    margin: 0 0 12px;
+  }
+
+  .collection-grid__empty-text {
+    font-size: 0.95rem;
+    color: #6B6B6B;
+    margin: 0;
+  }
+
+  @media (max-width: 991px) {
+    .collection-grid__products {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .collection-grid {
+      padding: 24px 16px;
+    }
+
+    .collection-grid__toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .collection-grid__filters {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding-bottom: 8px;
+    }
+
+    .collection-grid__products {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .product-card__content {
+      padding: 12px;
+    }
+
+    .product-card__title {
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<div class="collection-grid">
+
+  <!-- Toolbar -->
+  <div class="collection-grid__toolbar">
+    {% if section.settings.show_filters %}
+      <div class="collection-grid__filters">
+        <!-- Size Filter -->
+        <div class="collection-grid__filter" data-filter="size">
+          <button type="button" class="collection-grid__filter-btn">
+            Size <span aria-hidden="true">▾</span>
+          </button>
+          <div class="collection-grid__filter-dropdown">
+            <button type="button" class="collection-grid__filter-option" data-value="">All Sizes</button>
+            <button type="button" class="collection-grid__filter-option" data-value="4x4">4x4</button>
+            <button type="button" class="collection-grid__filter-option" data-value="8.5x11">8.5x11</button>
+            <button type="button" class="collection-grid__filter-option" data-value="16x20">16x20</button>
+            <button type="button" class="collection-grid__filter-option" data-value="18x20">18x20</button>
+          </div>
+        </div>
+
+        <!-- Pack Size Filter -->
+        <div class="collection-grid__filter" data-filter="pack">
+          <button type="button" class="collection-grid__filter-btn">
+            Pack Size <span aria-hidden="true">▾</span>
+          </button>
+          <div class="collection-grid__filter-dropdown">
+            <button type="button" class="collection-grid__filter-option" data-value="">All Packs</button>
+            <button type="button" class="collection-grid__filter-option" data-value="starter">Starter (1-25)</button>
+            <button type="button" class="collection-grid__filter-option" data-value="refill">Refill (50-100)</button>
+            <button type="button" class="collection-grid__filter-option" data-value="studio">Studio (200+)</button>
+          </div>
+        </div>
+
+        <!-- Best For Filter -->
+        <div class="collection-grid__filter" data-filter="best-for">
+          <button type="button" class="collection-grid__filter-btn">
+            Best For <span aria-hidden="true">▾</span>
+          </button>
+          <div class="collection-grid__filter-dropdown">
+            <button type="button" class="collection-grid__filter-option" data-value="">All Projects</button>
+            <button type="button" class="collection-grid__filter-option" data-value="stickers">Stickers</button>
+            <button type="button" class="collection-grid__filter-option" data-value="heat-press">Heat Press</button>
+            <button type="button" class="collection-grid__filter-option" data-value="diamond-painting">Diamond Painting</button>
+            <button type="button" class="collection-grid__filter-option" data-value="transfers">Transfers</button>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if section.settings.show_sort %}
+      <div class="collection-grid__sort">
+        <label class="collection-grid__sort-label" for="sort-select">Sort by:</label>
+        <select id="sort-select" class="collection-grid__sort-select">
+          <option value="best-selling" {% if collection.sort_by == 'best-selling' %}selected{% endif %}>Best Selling</option>
+          <option value="title-ascending" {% if collection.sort_by == 'title-ascending' %}selected{% endif %}>A-Z</option>
+          <option value="title-descending" {% if collection.sort_by == 'title-descending' %}selected{% endif %}>Z-A</option>
+          <option value="price-ascending" {% if collection.sort_by == 'price-ascending' %}selected{% endif %}>Price: Low to High</option>
+          <option value="price-descending" {% if collection.sort_by == 'price-descending' %}selected{% endif %}>Price: High to Low</option>
+          <option value="created-descending" {% if collection.sort_by == 'created-descending' %}selected{% endif %}>Newest</option>
+        </select>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Products Grid -->
+  <div class="collection-grid__products">
+    {% paginate collection.products by section.settings.products_per_page %}
+      {% if collection.products.size > 0 %}
+        {% for product in collection.products %}
+          <div class="product-card">
+            <div class="product-card__image-wrapper">
+              {% if product.featured_image %}
+                <img
+                  src="{{ product.featured_image | img_url: '400x400', crop: 'center' }}"
+                  alt="{{ product.featured_image.alt | escape }}"
+                  class="product-card__image"
+                  loading="lazy"
+                >
+              {% else %}
+                {{ 'product-1' | placeholder_svg_tag: 'product-card__image' }}
+              {% endif %}
+
+              {% if product.compare_at_price > product.price %}
+                <span class="product-card__badge product-card__badge--sale">Sale</span>
+              {% elsif product.tags contains 'bestseller' %}
+                <span class="product-card__badge">Best Seller</span>
+              {% endif %}
+            </div>
+
+            <div class="product-card__content">
+              {% if product.metafields.kk.best_for.value.first %}
+                <p class="product-card__best-for">{{ product.metafields.kk.best_for.value.first | capitalize }}</p>
+              {% endif %}
+
+              <h3 class="product-card__title">
+                <a href="{{ product.url }}">{{ product.title }}</a>
+              </h3>
+
+              <div class="product-card__price">
+                {{ product.price | money }}
+                {% if product.compare_at_price > product.price %}
+                  <span class="product-card__price-compare">{{ product.compare_at_price | money }}</span>
+                {% endif %}
+              </div>
+
+              <div class="product-card__reviews">
+                <span class="product-card__stars">★★★★★</span>
+                <span class="product-card__review-count">(0)</span>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="collection-grid__empty">
+          <h3 class="collection-grid__empty-title">No products found</h3>
+          <p class="collection-grid__empty-text">Try adjusting your filters or browse all products.</p>
+        </div>
+      {% endif %}
+
+      <!-- Pagination -->
+      {% if paginate.pages > 1 %}
+        <div class="collection-grid__pagination" style="grid-column: 1 / -1;">
+          {% if paginate.previous %}
+            <a href="{{ paginate.previous.url }}">← Previous</a>
+          {% endif %}
+
+          {% for part in paginate.parts %}
+            {% if part.is_link %}
+              <a href="{{ part.url }}">{{ part.title }}</a>
+            {% else %}
+              <span class="{% if part.title == paginate.current_page %}is-current{% endif %}">{{ part.title }}</span>
+            {% endif %}
+          {% endfor %}
+
+          {% if paginate.next %}
+            <a href="{{ paginate.next.url }}">Next →</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endpaginate %}
+  </div>
+
+</div>
+
+<script>
+(function() {
+  // Filter dropdowns
+  document.querySelectorAll('.collection-grid__filter').forEach(filter => {
+    const btn = filter.querySelector('.collection-grid__filter-btn');
+    const options = filter.querySelectorAll('.collection-grid__filter-option');
+
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.collection-grid__filter').forEach(f => {
+        if (f !== filter) f.classList.remove('is-open');
+      });
+      filter.classList.toggle('is-open');
+    });
+
+    options.forEach(option => {
+      option.addEventListener('click', () => {
+        options.forEach(o => o.classList.remove('is-selected'));
+        option.classList.add('is-selected');
+        btn.classList.toggle('is-active', option.dataset.value !== '');
+        filter.classList.remove('is-open');
+        // In production, this would filter the products via URL params or AJAX
+      });
+    });
+  });
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.collection-grid__filter')) {
+      document.querySelectorAll('.collection-grid__filter').forEach(f => f.classList.remove('is-open'));
+    }
+  });
+
+  // Sort select
+  const sortSelect = document.getElementById('sort-select');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', () => {
+      const url = new URL(window.location);
+      url.searchParams.set('sort_by', sortSelect.value);
+      window.location = url;
+    });
+  }
+})();
+</script>

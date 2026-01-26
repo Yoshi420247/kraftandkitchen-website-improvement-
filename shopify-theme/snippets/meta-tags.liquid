@@ -1,0 +1,143 @@
+{% comment %}
+  Kraft & Kitchen - Meta Tags
+  SEO and social sharing meta tags
+{% endcomment %}
+
+{% comment %} Open Graph / Facebook {% endcomment %}
+<meta property="og:site_name" content="{{ shop.name }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:title" content="{{ page_title }}">
+<meta property="og:type" content="{% if request.page_type == 'product' %}product{% elsif request.page_type == 'article' %}article{% else %}website{% endif %}">
+{% if page_description %}
+  <meta property="og:description" content="{{ page_description | escape }}">
+{% endif %}
+
+{% if request.page_type == 'product' %}
+  <meta property="og:image" content="https:{{ product.featured_image | img_url: '1200x630', crop: 'center' }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="product:price:amount" content="{{ product.price | money_without_currency }}">
+  <meta property="product:price:currency" content="{{ cart.currency.iso_code }}">
+{% elsif request.page_type == 'collection' and collection.image %}
+  <meta property="og:image" content="https:{{ collection.image | img_url: '1200x630', crop: 'center' }}">
+{% elsif request.page_type == 'article' and article.image %}
+  <meta property="og:image" content="https:{{ article.image | img_url: '1200x630', crop: 'center' }}">
+{% elsif settings.share_image %}
+  <meta property="og:image" content="https:{{ settings.share_image | img_url: '1200x630' }}">
+{% endif %}
+
+{% comment %} Twitter Card {% endcomment %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ page_title }}">
+{% if page_description %}
+  <meta name="twitter:description" content="{{ page_description | escape }}">
+{% endif %}
+
+{% if request.page_type == 'product' %}
+  <meta name="twitter:image" content="https:{{ product.featured_image | img_url: '1200x630', crop: 'center' }}">
+{% elsif request.page_type == 'collection' and collection.image %}
+  <meta name="twitter:image" content="https:{{ collection.image | img_url: '1200x630', crop: 'center' }}">
+{% elsif request.page_type == 'article' and article.image %}
+  <meta name="twitter:image" content="https:{{ article.image | img_url: '1200x630', crop: 'center' }}">
+{% elsif settings.share_image %}
+  <meta name="twitter:image" content="https:{{ settings.share_image | img_url: '1200x630' }}">
+{% endif %}
+
+{% comment %} Product Schema {% endcomment %}
+{% if request.page_type == 'product' %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": {{ product.title | json }},
+    "description": {{ product.description | strip_html | json }},
+    "image": [
+      {% for image in product.images limit: 5 %}
+        "https:{{ image | img_url: '1200x1200' }}"{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ],
+    "sku": {{ product.selected_or_first_available_variant.sku | json }},
+    "brand": {
+      "@type": "Brand",
+      "name": {{ product.vendor | json }}
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": "{{ shop.url }}{{ product.url }}",
+      "priceCurrency": "{{ cart.currency.iso_code }}",
+      "price": "{{ product.price | money_without_currency }}",
+      "availability": "{% if product.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
+      "seller": {
+        "@type": "Organization",
+        "name": {{ shop.name | json }}
+      }
+    }
+  }
+  </script>
+{% endif %}
+
+{% comment %} Organization Schema {% endcomment %}
+{% if request.page_type == 'index' %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": {{ shop.name | json }},
+    "url": {{ shop.url | json }},
+    {% if settings.social_instagram_link %}
+    "sameAs": [
+      {{ settings.social_instagram_link | json }}
+      {% if settings.social_facebook_link %},{{ settings.social_facebook_link | json }}{% endif %}
+      {% if settings.social_pinterest_link %},{{ settings.social_pinterest_link | json }}{% endif %}
+      {% if settings.social_tiktok_link %},{{ settings.social_tiktok_link | json }}{% endif %}
+    ],
+    {% endif %}
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "email": {{ shop.email | json }}
+    }
+  }
+  </script>
+{% endif %}
+
+{% comment %} Breadcrumb Schema {% endcomment %}
+{% if request.page_type == 'product' or request.page_type == 'collection' %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "{{ shop.url }}"
+      }
+      {% if request.page_type == 'collection' %}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ collection.title | json }},
+        "item": "{{ shop.url }}{{ collection.url }}"
+      }
+      {% elsif request.page_type == 'product' %}
+      {% if product.collections.size > 0 %}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{ product.collections.first.title | json }},
+        "item": "{{ shop.url }}{{ product.collections.first.url }}"
+      }
+      {% endif %}
+      ,{
+        "@type": "ListItem",
+        "position": {% if product.collections.size > 0 %}3{% else %}2{% endif %},
+        "name": {{ product.title | json }},
+        "item": "{{ shop.url }}{{ product.url }}"
+      }
+      {% endif %}
+    ]
+  }
+  </script>
+{% endif %}

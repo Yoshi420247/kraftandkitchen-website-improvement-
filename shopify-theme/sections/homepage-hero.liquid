@@ -1,0 +1,304 @@
+{% comment %}
+  Kraft & Kitchen - Homepage Hero Section
+  File: sections/homepage-hero.liquid
+
+  Craft-first hero with headline, subheadline, and CTAs.
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Homepage Hero",
+  "tag": "section",
+  "class": "homepage-hero-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Nonstick essentials for makers."
+    },
+    {
+      "type": "textarea",
+      "id": "subheadline",
+      "label": "Subheadline",
+      "default": "Release paper for stickers and diamond painting, plus PTFE cover sheets for heat press."
+    },
+    {
+      "type": "text",
+      "id": "primary_cta_text",
+      "label": "Primary CTA Text",
+      "default": "Shop Release Paper"
+    },
+    {
+      "type": "url",
+      "id": "primary_cta_link",
+      "label": "Primary CTA Link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_cta_text",
+      "label": "Secondary CTA Text",
+      "default": "Shop PTFE Sheets"
+    },
+    {
+      "type": "url",
+      "id": "secondary_cta_link",
+      "label": "Secondary CTA Link"
+    },
+    {
+      "type": "text",
+      "id": "tertiary_cta_text",
+      "label": "Tertiary CTA Text",
+      "default": "Size Finder"
+    },
+    {
+      "type": "url",
+      "id": "tertiary_cta_link",
+      "label": "Tertiary CTA Link"
+    },
+    {
+      "type": "select",
+      "id": "text_position",
+      "label": "Text Position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Homepage Hero"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .hero {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    min-height: 400px;
+    max-height: 600px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .hero__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+  }
+
+  .hero__background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero__background--fallback {
+    background: linear-gradient(135deg, #FAF8F5 0%, #E8DFD4 100%);
+  }
+
+  .hero__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 60%, transparent 100%);
+    z-index: 2;
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: 3;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .hero__content--left {
+    text-align: left;
+  }
+
+  .hero__content--center {
+    text-align: center;
+  }
+
+  .hero__content--center .hero__overlay {
+    background: rgba(255,255,255,0.85);
+  }
+
+  .hero__content--right {
+    text-align: right;
+  }
+
+  .hero__text {
+    max-width: 550px;
+  }
+
+  .hero__content--center .hero__text {
+    margin: 0 auto;
+  }
+
+  .hero__content--right .hero__text {
+    margin-left: auto;
+  }
+
+  .hero__headline {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 3rem;
+    line-height: 1.15;
+    font-weight: 700;
+    color: #2D2D2D;
+    margin: 0 0 16px;
+  }
+
+  .hero__subheadline {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    color: #6B6B6B;
+    margin: 0 0 32px;
+  }
+
+  .hero__ctas {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .hero__content--center .hero__ctas {
+    justify-content: center;
+  }
+
+  .hero__content--right .hero__ctas {
+    justify-content: flex-end;
+  }
+
+  .hero__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 52px;
+    padding: 0 28px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .hero__btn--primary {
+    background: #1A7F7F;
+    color: white;
+  }
+
+  .hero__btn--primary:hover {
+    background: #156666;
+  }
+
+  .hero__btn--secondary {
+    background: transparent;
+    color: #1A7F7F;
+    border: 2px solid #1A7F7F;
+  }
+
+  .hero__btn--secondary:hover {
+    background: rgba(26, 127, 127, 0.1);
+  }
+
+  .hero__btn--tertiary {
+    background: transparent;
+    color: #2D2D2D;
+    text-decoration: underline;
+    padding: 0 16px;
+  }
+
+  .hero__btn--tertiary:hover {
+    color: #1A7F7F;
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      aspect-ratio: auto;
+      min-height: 500px;
+      padding: 60px 0;
+    }
+
+    .hero__content {
+      padding: 0 20px;
+    }
+
+    .hero__headline {
+      font-size: 2rem;
+    }
+
+    .hero__subheadline {
+      font-size: 1rem;
+    }
+
+    .hero__overlay {
+      background: rgba(255,255,255,0.9);
+    }
+
+    .hero__ctas {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .hero__btn {
+      justify-content: center;
+    }
+  }
+</style>
+
+<section class="hero">
+  <div class="hero__background {% unless section.settings.background_image %}hero__background--fallback{% endunless %}">
+    {% if section.settings.background_image %}
+      {{ section.settings.background_image | image_url: width: 1920 | image_tag: loading: 'eager', fetchpriority: 'high' }}
+    {% endif %}
+  </div>
+
+  <div class="hero__overlay"></div>
+
+  <div class="hero__content hero__content--{{ section.settings.text_position }}">
+    <div class="hero__text">
+      <h1 class="hero__headline">{{ section.settings.headline }}</h1>
+      <p class="hero__subheadline">{{ section.settings.subheadline }}</p>
+
+      <div class="hero__ctas">
+        {% if section.settings.primary_cta_link %}
+          <a href="{{ section.settings.primary_cta_link }}" class="hero__btn hero__btn--primary">
+            {{ section.settings.primary_cta_text }}
+          </a>
+        {% endif %}
+
+        {% if section.settings.secondary_cta_link %}
+          <a href="{{ section.settings.secondary_cta_link }}" class="hero__btn hero__btn--secondary">
+            {{ section.settings.secondary_cta_text }}
+          </a>
+        {% endif %}
+
+        {% if section.settings.tertiary_cta_link %}
+          <a href="{{ section.settings.tertiary_cta_link }}" class="hero__btn hero__btn--tertiary">
+            {{ section.settings.tertiary_cta_text }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>

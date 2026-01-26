@@ -1,0 +1,183 @@
+{% comment %}
+  Kraft & Kitchen - Collection Hero Section
+  File: sections/collection-hero.liquid
+
+  Collection page hero with:
+  - Collection title
+  - Description
+  - Product count
+  - Size Finder link
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Collection Hero",
+  "tag": "section",
+  "class": "collection-hero-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color (fallback)",
+      "default": "#FAF8F5"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "Show product count",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_size_finder_link",
+      "label": "Show Size Finder link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "size_finder_text",
+      "label": "Size Finder link text",
+      "default": "Not sure which size? Try our Size Finder"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Hero"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .collection-hero {
+    position: relative;
+    padding: 48px 24px;
+    background-color: {{ section.settings.background_color }};
+    background-size: cover;
+    background-position: center;
+    {% if section.settings.background_image %}
+      background-image: url('{{ section.settings.background_image | img_url: "1400x400" }}');
+    {% endif %}
+  }
+
+  {% if section.settings.background_image %}
+  .collection-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.85);
+  }
+  {% endif %}
+
+  .collection-hero__container {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .collection-hero__content {
+    max-width: 700px;
+  }
+
+  .collection-hero__title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 2.5rem;
+    color: #2D2D2D;
+    margin: 0 0 12px;
+  }
+
+  .collection-hero__count {
+    display: inline-block;
+    font-size: 0.9rem;
+    color: #6B6B6B;
+    margin-bottom: 12px;
+  }
+
+  .collection-hero__description {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #4A4A4A;
+    margin: 0;
+  }
+
+  .collection-hero__size-finder {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: white;
+    border: 2px solid #1A7F7F;
+    border-radius: 8px;
+    color: #1A7F7F;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .collection-hero__size-finder:hover {
+    background: #1A7F7F;
+    color: white;
+  }
+
+  .collection-hero__size-finder-icon {
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 768px) {
+    .collection-hero {
+      padding: 32px 16px;
+    }
+
+    .collection-hero__title {
+      font-size: 1.75rem;
+    }
+
+    .collection-hero__container {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .collection-hero__size-finder {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="collection-hero">
+  <div class="collection-hero__container">
+    <div class="collection-hero__content">
+      <h1 class="collection-hero__title">{{ collection.title }}</h1>
+
+      {% if section.settings.show_product_count %}
+        <span class="collection-hero__count">
+          {{ collection.products_count }} {{ collection.products_count | pluralize: 'product', 'products' }}
+        </span>
+      {% endif %}
+
+      {% if collection.description != blank %}
+        <p class="collection-hero__description">{{ collection.description }}</p>
+      {% elsif collection.metafields.kk.collection_intro %}
+        <p class="collection-hero__description">{{ collection.metafields.kk.collection_intro }}</p>
+      {% endif %}
+    </div>
+
+    {% if section.settings.show_size_finder_link %}
+      <a href="/pages/size-finder" class="collection-hero__size-finder">
+        <span class="collection-hero__size-finder-icon">📐</span>
+        <span>{{ section.settings.size_finder_text }}</span>
+      </a>
+    {% endif %}
+  </div>
+</div>

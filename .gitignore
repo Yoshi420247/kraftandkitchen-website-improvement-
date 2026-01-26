@@ -1,0 +1,35 @@
+# Environment variables - NEVER COMMIT API KEYS
+.env
+.env.local
+.env.production
+*.env
+
+# Generated images (large files)
+generated_images/
+image-generator/generated_images/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (if used)
+node_modules/
+
+# Logs
+*.log

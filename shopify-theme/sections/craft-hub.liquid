@@ -1,0 +1,730 @@
+{% comment %}
+  Kraft & Kitchen - Craft Hub Landing Page Section
+  File: sections/craft-hub.liquid
+
+  This is the main "front door" for craft shoppers.
+  Add to your theme and create a page template that uses this section.
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Craft Hub",
+  "tag": "section",
+  "class": "craft-hub-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Non-stick Supplies for Heat Transfer, Stickers, and Diamond Painting"
+    },
+    {
+      "type": "text",
+      "id": "subheadline",
+      "label": "Subheadline",
+      "default": "PTFE cover sheets + silicone release paper in craft-friendly sizes. Fast shipping. Bulk pricing when you need it."
+    },
+    {
+      "type": "url",
+      "id": "primary_cta_link",
+      "label": "Primary CTA Link"
+    },
+    {
+      "type": "text",
+      "id": "primary_cta_text",
+      "label": "Primary CTA Text",
+      "default": "Shop by Craft"
+    },
+    {
+      "type": "url",
+      "id": "secondary_cta_link",
+      "label": "Secondary CTA Link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_cta_text",
+      "label": "Secondary CTA Text",
+      "default": "Help Me Choose"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "craft_tile",
+      "name": "Craft Tile",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Heat Press + Sublimation"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "PTFE cover sheets protect your platen and designs. Reusable, heat-rated to 500°F."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Tile Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "product_type",
+      "name": "Product Type Card",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "PTFE Cover Sheets"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "Pre-cut sizes for heat presses. 16x20, 18x20, and custom cuts."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Craft Hub",
+      "blocks": [
+        {
+          "type": "craft_tile",
+          "settings": {
+            "title": "Heat Press + Sublimation + DTF",
+            "description": "PTFE cover sheets protect your platen and designs. Reusable, heat-rated to 500°F."
+          }
+        },
+        {
+          "type": "craft_tile",
+          "settings": {
+            "title": "Stickers + Decals + Transfer",
+            "description": "Double-sided silicone release paper for sticker books, decal storage, and backing sheets."
+          }
+        },
+        {
+          "type": "craft_tile",
+          "settings": {
+            "title": "Diamond Painting",
+            "description": "4\" x 4\" release paper squares protect your adhesive canvas while you work in sections."
+          }
+        },
+        {
+          "type": "craft_tile",
+          "settings": {
+            "title": "Resin + Glue + Messy Crafts",
+            "description": "Silicone mats and release surfaces for easy cleanup. Nothing sticks."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .craft-hub {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* Hero Section */
+  .craft-hub__hero {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #FAF8F5 0%, #E8DFD4 100%);
+    border-radius: 12px;
+    margin-bottom: 60px;
+  }
+
+  .craft-hub__hero h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 2.5rem;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    color: #2D2D2D;
+  }
+
+  .craft-hub__subhead {
+    font-size: 1.25rem;
+    color: #6B6B6B;
+    max-width: 600px;
+    margin: 0 auto 24px;
+    line-height: 1.5;
+  }
+
+  .craft-hub__hero-cta {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    padding: 0 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .btn--primary {
+    background: #1A7F7F;
+    color: white;
+    border: none;
+  }
+
+  .btn--primary:hover {
+    background: #156666;
+  }
+
+  .btn--secondary {
+    background: transparent;
+    color: #1A7F7F;
+    border: 2px solid #1A7F7F;
+  }
+
+  .btn--secondary:hover {
+    background: #E6F3F3;
+  }
+
+  /* Shop by Craft Tiles */
+  .craft-hub__craft-tiles {
+    margin-bottom: 60px;
+  }
+
+  .craft-hub__craft-tiles h2 {
+    text-align: center;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 2rem;
+    margin-bottom: 8px;
+    color: #2D2D2D;
+  }
+
+  .section-intro {
+    text-align: center;
+    color: #6B6B6B;
+    margin-bottom: 32px;
+  }
+
+  .craft-tiles__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .craft-tile {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #E5E5E5;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: white;
+  }
+
+  .craft-tile:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .craft-tile__image {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+
+  .craft-tile__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .craft-tile__content {
+    padding: 20px;
+  }
+
+  .craft-tile__content h3 {
+    margin: 0 0 8px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2D2D2D;
+  }
+
+  .craft-tile__content p {
+    margin: 0 0 12px;
+    color: #6B6B6B;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .craft-tile__cta {
+    color: #1A7F7F;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  /* Product Types */
+  .craft-hub__product-types {
+    margin-bottom: 60px;
+  }
+
+  .craft-hub__product-types h2 {
+    text-align: center;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 2rem;
+    margin-bottom: 32px;
+    color: #2D2D2D;
+  }
+
+  .product-types__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .product-type-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 24px;
+    border: 2px solid #E5E5E5;
+    border-radius: 8px;
+    text-align: center;
+    transition: border-color 0.2s ease;
+    background: white;
+  }
+
+  .product-type-card:hover {
+    border-color: #1A7F7F;
+  }
+
+  .product-type-card h3 {
+    margin: 0 0 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2D2D2D;
+  }
+
+  .product-type-card p {
+    margin: 0;
+    color: #6B6B6B;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  /* Product Chooser */
+  .craft-hub__chooser {
+    background: #FAF8F5;
+    padding: 48px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .craft-hub__chooser h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.75rem;
+    margin-bottom: 8px;
+    color: #2D2D2D;
+  }
+
+  .craft-hub__chooser > p {
+    color: #6B6B6B;
+    margin-bottom: 24px;
+  }
+
+  .chooser__form {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .chooser__form select {
+    width: 100%;
+    padding: 16px;
+    font-size: 1rem;
+    border: 2px solid #E5E5E5;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+  }
+
+  .chooser__form select:focus {
+    outline: none;
+    border-color: #1A7F7F;
+  }
+
+  .chooser__result {
+    margin-top: 24px;
+    text-align: left;
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid #E5E5E5;
+  }
+
+  .recommendation h4 {
+    color: #1A7F7F;
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+  }
+
+  .recommendation ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px;
+  }
+
+  .recommendation li {
+    padding: 4px 0;
+  }
+
+  .recommendation__why {
+    font-style: italic;
+    color: #6B6B6B;
+    margin: 16px 0;
+  }
+
+  /* Trust Strip */
+  .craft-hub__trust {
+    margin-bottom: 60px;
+  }
+
+  .trust__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    text-align: center;
+    padding: 40px 0;
+    border-top: 1px solid #E5E5E5;
+    border-bottom: 1px solid #E5E5E5;
+  }
+
+  .trust__item strong {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 4px;
+    color: #2D2D2D;
+  }
+
+  .trust__item p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6B6B6B;
+  }
+
+  /* Education Links */
+  .craft-hub__education h2 {
+    text-align: center;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.75rem;
+    margin-bottom: 32px;
+    color: #2D2D2D;
+  }
+
+  .education__links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .education-link {
+    display: block;
+    padding: 24px;
+    background: #FAF8F5;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s ease;
+  }
+
+  .education-link:hover {
+    background: #E8DFD4;
+  }
+
+  .education-link h3 {
+    margin: 0 0 8px;
+    color: #1A7F7F;
+    font-size: 1.1rem;
+  }
+
+  .education-link p {
+    margin: 0;
+    color: #6B6B6B;
+    font-size: 0.9rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .craft-hub__hero h1 {
+      font-size: 1.75rem;
+    }
+
+    .craft-hub__subhead {
+      font-size: 1rem;
+    }
+
+    .craft-hub__hero {
+      padding: 40px 20px;
+    }
+
+    .craft-hub__chooser {
+      padding: 32px 20px;
+    }
+  }
+</style>
+
+<div class="craft-hub">
+
+  <!-- Hero Section -->
+  <section class="craft-hub__hero">
+    <h1>{{ section.settings.headline }}</h1>
+    <p class="craft-hub__subhead">{{ section.settings.subheadline }}</p>
+    <div class="craft-hub__hero-cta">
+      {% if section.settings.primary_cta_link %}
+        <a href="{{ section.settings.primary_cta_link }}" class="btn btn--primary">
+          {{ section.settings.primary_cta_text }}
+        </a>
+      {% endif %}
+      {% if section.settings.secondary_cta_link %}
+        <a href="{{ section.settings.secondary_cta_link }}" class="btn btn--secondary">
+          {{ section.settings.secondary_cta_text }}
+        </a>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- Shop by Craft Tiles -->
+  <section class="craft-hub__craft-tiles">
+    <h2>Shop by Craft</h2>
+    <p class="section-intro">Find exactly what you need for your project</p>
+
+    <div class="craft-tiles__grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'craft_tile' %}
+          <a href="{{ block.settings.link }}" class="craft-tile" {{ block.shopify_attributes }}>
+            {% if block.settings.image %}
+              <div class="craft-tile__image">
+                {{ block.settings.image | image_url: width: 600 | image_tag: loading: 'lazy' }}
+              </div>
+            {% else %}
+              <div class="craft-tile__image" style="background: #E8DFD4;"></div>
+            {% endif %}
+            <div class="craft-tile__content">
+              <h3>{{ block.settings.title }}</h3>
+              <p>{{ block.settings.description }}</p>
+              <span class="craft-tile__cta">Shop Now →</span>
+            </div>
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Shop by Product Type -->
+  <section class="craft-hub__product-types">
+    <h2>Shop by Product Type</h2>
+
+    <div class="product-types__grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'product_type' %}
+          <a href="{{ block.settings.link }}" class="product-type-card" {{ block.shopify_attributes }}>
+            <h3>{{ block.settings.title }}</h3>
+            <p>{{ block.settings.description }}</p>
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Product Chooser -->
+  <section class="craft-hub__chooser">
+    <h2>What Are You Making?</h2>
+    <p>Tell us your project, and we'll recommend the right product, size, and pack.</p>
+
+    <div class="chooser__form">
+      <label for="craft-type" class="visually-hidden">Select your craft</label>
+      <select id="craft-type" name="craft-type">
+        <option value="">Choose your project...</option>
+        <optgroup label="Heat Transfer">
+          <option value="heat-press-htv">Heat press with HTV vinyl</option>
+          <option value="sublimation">Sublimation printing</option>
+          <option value="dtf-transfer">DTF transfers</option>
+        </optgroup>
+        <optgroup label="Stickers & Decals">
+          <option value="sticker-storage">Sticker book / storage pages</option>
+          <option value="sticker-making">Making stickers (backing sheets)</option>
+          <option value="decal-transfer">Decal transfer backing</option>
+        </optgroup>
+        <optgroup label="Diamond Painting">
+          <option value="diamond-painting">Diamond painting (protecting adhesive)</option>
+        </optgroup>
+        <optgroup label="Other Crafts">
+          <option value="resin-epoxy">Resin / epoxy projects</option>
+          <option value="hot-glue">Hot glue crafts</option>
+        </optgroup>
+      </select>
+
+      <div id="chooser-result" class="chooser__result" style="display: none;"></div>
+    </div>
+  </section>
+
+  <!-- Trust Strip -->
+  <section class="craft-hub__trust">
+    <div class="trust__grid">
+      <div class="trust__item">
+        <strong>Fast Shipping</strong>
+        <p>Orders ship within 1-2 business days</p>
+      </div>
+      <div class="trust__item">
+        <strong>Craft-Friendly Sizes</strong>
+        <p>From starter packs to bulk quantities</p>
+      </div>
+      <div class="trust__item">
+        <strong>Quality Materials</strong>
+        <p>Same specs trusted by professionals</p>
+      </div>
+      <div class="trust__item">
+        <strong>Real Support</strong>
+        <p>Questions? We're here to help</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Education Links -->
+  <section class="craft-hub__education">
+    <h2>Learn Before You Buy</h2>
+
+    <div class="education__links">
+      <a href="/pages/ptfe-sheet-for-heat-press" class="education-link">
+        <h3>PTFE vs Parchment Paper</h3>
+        <p>When to use each one for your heat press</p>
+      </a>
+      <a href="/pages/release-paper-for-stickers" class="education-link">
+        <h3>Release Paper Guide</h3>
+        <p>Single-sided vs double-sided explained</p>
+      </a>
+      <a href="/pages/diamond-painting-release-paper" class="education-link">
+        <h3>Diamond Painting Tips</h3>
+        <p>How to use release paper squares correctly</p>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // Product Chooser Logic
+  document.getElementById('craft-type').addEventListener('change', function() {
+    const result = document.getElementById('chooser-result');
+    const recommendations = {
+      'heat-press-htv': {
+        product: 'PTFE Cover Sheet',
+        size: '16x20" or 18x20"',
+        pack: 'Start with 2-pack',
+        link: '/collections/ptfe-sheets',
+        why: 'Protects your upper platen from vinyl residue and provides even heat distribution.'
+      },
+      'sublimation': {
+        product: 'PTFE Cover Sheet',
+        size: '16x20" or match your press size',
+        pack: '2-pack for home use, 5-pack for frequent use',
+        link: '/collections/ptfe-sheets',
+        why: 'Prevents ink ghosting and protects your heat press platen.'
+      },
+      'dtf-transfer': {
+        product: 'PTFE Cover Sheet',
+        size: '16x20"',
+        pack: '2-pack minimum',
+        link: '/collections/ptfe-sheets',
+        why: 'Essential barrier between transfer and heat element.'
+      },
+      'sticker-storage': {
+        product: 'Double-Sided Silicone Release Paper',
+        size: '8.5" x 11" (Letter)',
+        pack: '50-pack for sticker books, 100-pack for heavy collectors',
+        link: '/collections/release-paper-stickers',
+        why: 'Fits standard binders. Stickers peel cleanly from both sides.'
+      },
+      'sticker-making': {
+        product: 'Silicone Release Paper',
+        size: '8.5" x 11" or 8.5" x 14"',
+        pack: '100-pack for small batches, 250-pack for production',
+        link: '/collections/release-paper',
+        why: 'Provides clean release backing for your sticker sheets.'
+      },
+      'decal-transfer': {
+        product: 'Silicone Release Paper',
+        size: '8.5" x 11"',
+        pack: '50-100 sheets',
+        link: '/collections/release-paper',
+        why: 'Smooth release surface for decal transfer applications.'
+      },
+      'diamond-painting': {
+        product: 'Diamond Painting Release Paper Squares',
+        size: '4" x 4"',
+        pack: '100-pack for beginners, 200-pack for multiple projects',
+        link: '/collections/release-paper-diamond-painting',
+        why: 'Protects adhesive canvas from dust while you work section by section.'
+      },
+      'resin-epoxy': {
+        product: 'Silicone Work Mat',
+        size: 'Match your workspace',
+        pack: '1-2 mats',
+        link: '/collections/silicone-mats',
+        why: 'Cured resin peels right off. Protects your work surface.'
+      },
+      'hot-glue': {
+        product: 'Silicone Work Mat',
+        size: 'Small or medium',
+        pack: '1 mat',
+        link: '/collections/silicone-mats',
+        why: 'Hot glue releases easily when cooled. Reusable indefinitely.'
+      }
+    };
+
+    const selected = this.value;
+    if (selected && recommendations[selected]) {
+      const rec = recommendations[selected];
+      result.innerHTML = `
+        <div class="recommendation">
+          <h4>We Recommend: ${rec.product}</h4>
+          <ul>
+            <li><strong>Size:</strong> ${rec.size}</li>
+            <li><strong>Pack size:</strong> ${rec.pack}</li>
+          </ul>
+          <p class="recommendation__why">${rec.why}</p>
+          <a href="${rec.link}" class="btn btn--primary">Shop Now →</a>
+        </div>
+      `;
+      result.style.display = 'block';
+    } else {
+      result.style.display = 'none';
+    }
+  });
+</script>

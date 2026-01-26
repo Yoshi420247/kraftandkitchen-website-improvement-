@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "collection-hero": {
+      "type": "collection-hero",
+      "settings": {
+        "show_size_finder": true
+      }
+    },
+    "collection-grid": {
+      "type": "collection-product-grid",
+      "settings": {
+        "products_per_page": 16,
+        "show_filters": true,
+        "show_sort": true,
+        "grid_columns": "4"
+      }
+    },
+    "trust-strip": {
+      "type": "trust-strip",
+      "blocks": {
+        "badge-1": {
+          "type": "badge",
+          "settings": {
+            "icon": "🚚",
+            "text": "Free Shipping $35+",
+            "subtext": ""
+          }
+        },
+        "badge-2": {
+          "type": "badge",
+          "settings": {
+            "icon": "⭐",
+            "text": "5-Star Reviews",
+            "subtext": ""
+          }
+        },
+        "badge-3": {
+          "type": "badge",
+          "settings": {
+            "icon": "📦",
+            "text": "Fast Processing",
+            "subtext": ""
+          }
+        }
+      },
+      "block_order": ["badge-1", "badge-2", "badge-3"],
+      "settings": {}
+    }
+  },
+  "order": [
+    "collection-hero",
+    "collection-grid",
+    "trust-strip"
+  ]
+}

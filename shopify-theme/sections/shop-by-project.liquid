@@ -1,0 +1,224 @@
+{% comment %}
+  Kraft & Kitchen - Shop by Project Section
+  File: sections/shop-by-project.liquid
+
+  6 tiles for different craft projects: Stickers, Transfers, Heat Press, Diamond Painting, Resin, Work Surfaces
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Shop by Project",
+  "tag": "section",
+  "class": "shop-by-project-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop by Project"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Find exactly what you need for your craft"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "project_tile",
+      "name": "Project Tile",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Stickers + Sticker Books"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop by Project",
+      "blocks": [
+        { "type": "project_tile", "settings": { "title": "Stickers + Sticker Books" } },
+        { "type": "project_tile", "settings": { "title": "Transfers + UV DTF" } },
+        { "type": "project_tile", "settings": { "title": "Heat Press + Sublimation" } },
+        { "type": "project_tile", "settings": { "title": "Diamond Painting" } },
+        { "type": "project_tile", "settings": { "title": "Resin + Glue" } },
+        { "type": "project_tile", "settings": { "title": "Work Surfaces" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .shop-by-project {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 72px 20px;
+  }
+
+  .shop-by-project__header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .shop-by-project__heading {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 2rem;
+    color: #2D2D2D;
+    margin: 0 0 8px;
+  }
+
+  .shop-by-project__subheading {
+    color: #6B6B6B;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  .shop-by-project__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .project-tile {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: white;
+  }
+
+  .project-tile__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .project-tile__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .project-tile:hover .project-tile__image img {
+    transform: scale(1.05);
+  }
+
+  .project-tile__placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #E8DFD4 0%, #C4B6A4 100%);
+  }
+
+  .project-tile__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
+    z-index: 1;
+  }
+
+  .project-tile__content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24px;
+    z-index: 2;
+  }
+
+  .project-tile__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .project-tile__arrow {
+    display: inline-block;
+    margin-top: 8px;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.2s ease;
+  }
+
+  .project-tile:hover .project-tile__arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  @media (max-width: 900px) {
+    .shop-by-project__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .shop-by-project {
+      padding: 48px 20px;
+    }
+
+    .shop-by-project__grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .project-tile {
+      aspect-ratio: 16 / 9;
+    }
+
+    .project-tile__title {
+      font-size: 1.1rem;
+    }
+  }
+</style>
+
+<section class="shop-by-project">
+  <header class="shop-by-project__header">
+    <h2 class="shop-by-project__heading">{{ section.settings.heading }}</h2>
+    {% if section.settings.subheading != blank %}
+      <p class="shop-by-project__subheading">{{ section.settings.subheading }}</p>
+    {% endif %}
+  </header>
+
+  <div class="shop-by-project__grid">
+    {% for block in section.blocks %}
+      <a href="{{ block.settings.link }}" class="project-tile" {{ block.shopify_attributes }}>
+        <div class="project-tile__image">
+          {% if block.settings.image %}
+            {{ block.settings.image | image_url: width: 600 | image_tag: loading: 'lazy' }}
+          {% else %}
+            <div class="project-tile__placeholder"></div>
+          {% endif %}
+        </div>
+        <div class="project-tile__overlay"></div>
+        <div class="project-tile__content">
+          <h3 class="project-tile__title">{{ block.settings.title }}</h3>
+          <span class="project-tile__arrow">Shop →</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>

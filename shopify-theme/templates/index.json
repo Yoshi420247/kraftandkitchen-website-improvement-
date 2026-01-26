@@ -1,0 +1,124 @@
+{
+  "sections": {
+    "homepage-hero": {
+      "type": "homepage-hero",
+      "settings": {
+        "background_image": "",
+        "headline": "Craft Supplies That Work",
+        "subheadline": "Premium PTFE cover sheets, silicone release paper, and work mats for heat press, stickers, diamond painting, and more.",
+        "cta_1_text": "Shop All Craft Supplies",
+        "cta_1_url": "/collections/all",
+        "cta_2_text": "Find Your Size",
+        "cta_2_url": "/pages/size-finder",
+        "cta_3_text": "Craft Hub",
+        "cta_3_url": "/pages/craft-hub"
+      }
+    },
+    "trust-strip": {
+      "type": "trust-strip",
+      "blocks": {
+        "badge-1": {
+          "type": "badge",
+          "settings": {
+            "icon": "🚚",
+            "text": "Free Shipping $35+",
+            "subtext": "From Washington"
+          }
+        },
+        "badge-2": {
+          "type": "badge",
+          "settings": {
+            "icon": "⭐",
+            "text": "5-Star Reviews",
+            "subtext": "From real crafters"
+          }
+        },
+        "badge-3": {
+          "type": "badge",
+          "settings": {
+            "icon": "🔒",
+            "text": "Secure Checkout",
+            "subtext": "SSL encrypted"
+          }
+        },
+        "badge-4": {
+          "type": "badge",
+          "settings": {
+            "icon": "💬",
+            "text": "Expert Support",
+            "subtext": "Real craft help"
+          }
+        }
+      },
+      "block_order": ["badge-1", "badge-2", "badge-3", "badge-4"],
+      "settings": {}
+    },
+    "shop-by-project": {
+      "type": "shop-by-project",
+      "settings": {
+        "heading": "What Are You Making?",
+        "subheading": "Find the right supplies for your craft"
+      }
+    },
+    "best-sellers": {
+      "type": "best-sellers",
+      "settings": {
+        "heading": "Customer Favorites",
+        "collection": "best-sellers",
+        "products_to_show": 4
+      }
+    },
+    "size-finder-promo": {
+      "type": "homepage-hero",
+      "settings": {
+        "background_color": "#FAF8F5",
+        "headline": "Not Sure What Size?",
+        "subheadline": "Answer 2 quick questions and we'll recommend the perfect product for your project.",
+        "cta_1_text": "Find Your Size",
+        "cta_1_url": "/pages/size-finder",
+        "text_position": "center"
+      }
+    },
+    "product-how-to-use": {
+      "type": "product-how-to-use",
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "icon": "1️⃣",
+            "title": "Choose Your Project",
+            "description": "Heat press, stickers, diamond painting, or resin"
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "icon": "2️⃣",
+            "title": "Pick Your Size",
+            "description": "Use our Size Finder for the perfect fit"
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "icon": "3️⃣",
+            "title": "Create with Confidence",
+            "description": "Premium materials for professional results"
+          }
+        }
+      },
+      "block_order": ["step-1", "step-2", "step-3"],
+      "settings": {
+        "heading": "How It Works"
+      }
+    }
+  },
+  "order": [
+    "homepage-hero",
+    "trust-strip",
+    "shop-by-project",
+    "best-sellers",
+    "size-finder-promo",
+    "product-how-to-use"
+  ]
+}
