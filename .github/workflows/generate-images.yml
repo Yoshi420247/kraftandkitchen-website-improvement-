@@ -1,0 +1,160 @@
+name: Generate Product Images (Nano Banana Pro)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Generation mode'
+        required: true
+        default: 'preset'
+        type: choice
+        options:
+          - preset
+          - custom
+      preset:
+        description: 'Product preset (for preset mode)'
+        required: false
+        default: 'ptfe-sheets'
+        type: choice
+        options:
+          - ptfe-sheets
+          - release-paper-letter
+          - diamond-painting-squares
+          - silicone-mats
+          - homepage-hero
+          - project-tiles
+      custom_prompt:
+        description: 'Custom prompt (for custom mode)'
+        required: false
+        type: string
+      model:
+        description: 'AI Model to use'
+        required: false
+        default: 'gemini'
+        type: choice
+        options:
+          - gemini
+          - gemini-pro
+      upload_to_shopify:
+        description: 'Upload to Shopify'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      search_competitors:
+        description: 'Search competitor images as reference'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+env:
+  GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+  SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+  SHOPIFY_ACCESS_TOKEN: ${{ secrets.SHOPIFY_ACCESS_TOKEN }}
+
+jobs:
+  generate-images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Verify API Key
+        run: |
+          if [ -z "$GOOGLE_API_KEY" ]; then
+            echo "❌ GOOGLE_API_KEY secret is not set"
+            echo "Please add it in: Settings > Secrets > Actions > New repository secret"
+            exit 1
+          fi
+          echo "✅ API Key configured (${GOOGLE_API_KEY:0:10}...)"
+
+      - name: Test API Connection
+        run: |
+          python tools/nano_banana_generator.py --test
+
+      - name: Generate Images (Preset Mode)
+        if: ${{ inputs.mode == 'preset' }}
+        run: |
+          echo "🎨 Generating images for preset: ${{ inputs.preset }}"
+
+          UPLOAD_FLAG=""
+          if [ "${{ inputs.upload_to_shopify }}" == "true" ]; then
+            UPLOAD_FLAG="--upload"
+          fi
+
+          python tools/nano_banana_generator.py \
+            --preset ${{ inputs.preset }} \
+            --model ${{ inputs.model }} \
+            $UPLOAD_FLAG
+
+      - name: Generate Images (Custom Mode)
+        if: ${{ inputs.mode == 'custom' && inputs.custom_prompt != '' }}
+        run: |
+          echo "🎨 Generating custom image"
+
+          SEARCH_FLAG=""
+          if [ "${{ inputs.search_competitors }}" == "true" ]; then
+            SEARCH_FLAG="--search-competitors"
+          fi
+
+          python tools/nano_banana_generator.py \
+            "${{ inputs.custom_prompt }}" \
+            --model ${{ inputs.model }} \
+            $SEARCH_FLAG \
+            -o generated_images/custom_output.png
+
+      - name: List Generated Images
+        run: |
+          echo "📁 Generated images:"
+          if [ -d "generated_images" ]; then
+            ls -la generated_images/
+          else
+            echo "No images generated"
+          fi
+
+      - name: Upload Generated Images as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-product-images
+          path: generated_images/
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Summary
+        run: |
+          echo "## 🎨 Image Generation Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Mode:** ${{ inputs.mode }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ inputs.mode }}" == "preset" ]; then
+            echo "**Preset:** ${{ inputs.preset }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Prompt:** ${{ inputs.custom_prompt }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "**Model:** ${{ inputs.model }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Upload to Shopify:** ${{ inputs.upload_to_shopify }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Generated Files" >> $GITHUB_STEP_SUMMARY
+          if [ -d "generated_images" ]; then
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            ls -la generated_images/ >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📦 Download images from the **Artifacts** section below." >> $GITHUB_STEP_SUMMARY
