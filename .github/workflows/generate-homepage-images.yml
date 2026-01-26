@@ -1,0 +1,63 @@
+name: Generate Homepage Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      hero_prompt:
+        description: 'Hero banner image prompt'
+        required: true
+        default: 'Professional kitchen workspace with glass jars, silicone mats, and parchment paper, warm lighting, clean modern aesthetic, product photography style'
+      promo1_prompt:
+        description: 'Glass Jars promo image prompt'
+        required: true
+        default: 'Clear glass jars with black lids arranged elegantly, product photography, white background, professional lighting'
+      promo2_prompt:
+        description: 'Nonstick Paper promo image prompt'
+        required: true
+        default: 'Rolls of parchment paper and silicone baking sheets, kitchen setting, professional product photography'
+      promo3_prompt:
+        description: 'FEP Sheets promo image prompt'
+        required: true
+        default: 'Crystal clear FEP film sheets, transparent nonstick material, professional product photography, clean background'
+      promo4_prompt:
+        description: 'Silicone Pads promo image prompt'
+        required: true
+        default: 'Colorful silicone baking mats and trivets, heat resistant kitchen accessories, product photography'
+
+jobs:
+  generate-images:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r scripts/requirements.txt
+
+      - name: Generate and upload images
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          SHOPIFY_ACCESS_TOKEN: ${{ secrets.SHOPIFY_ACCESS_TOKEN }}
+          SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+        run: |
+          python scripts/generate_images.py \
+            --hero "${{ github.event.inputs.hero_prompt }}" \
+            --promo1 "${{ github.event.inputs.promo1_prompt }}" \
+            --promo2 "${{ github.event.inputs.promo2_prompt }}" \
+            --promo3 "${{ github.event.inputs.promo3_prompt }}" \
+            --promo4 "${{ github.event.inputs.promo4_prompt }}"
+
+      - name: Commit results
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git diff --staged --quiet || git commit -m "Update homepage images via Gemini API"
+          git push
