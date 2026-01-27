@@ -24,6 +24,9 @@ on:
         required: true
         default: 'Colorful silicone baking mats and trivets, heat resistant kitchen accessories, product photography'
 
+permissions:
+  contents: write
+
 jobs:
   generate-images:
     runs-on: ubuntu-latest
