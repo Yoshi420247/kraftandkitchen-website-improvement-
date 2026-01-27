@@ -273,6 +273,10 @@ def main():
     shopify_token = os.environ.get("SHOPIFY_ACCESS_TOKEN")
     shopify_store = os.environ.get("SHOPIFY_STORE", "kraftandkitchen")
 
+    # Normalize store name - remove .myshopify.com suffix if present
+    shopify_store = shopify_store.replace(".myshopify.com", "").replace("https://", "").replace("http://", "").strip("/")
+    print(f"Using Shopify store: {shopify_store}")
+
     if not google_api_key:
         raise Exception("GOOGLE_API_KEY not set")
     if not shopify_token:
